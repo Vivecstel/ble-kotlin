@@ -10,8 +10,7 @@ object Versions {
     const val detekt = "1.14.2"
 
     /* libraries */
-    const val core = "1.3.2"
-    const val fragment = "1.2.5"
+    const val appCompat = "1.2.0"
     const val material = "1.2.1"
     const val recyclerView = "1.1.0"
     const val timber = "4.7.1"

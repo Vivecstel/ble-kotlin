@@ -36,8 +36,10 @@ android {
 }
 
 dependencies {
-
-    implementation(Libraries.fragment)
+    implementation(project(":blekotlin"))
+    implementation(Libraries.kotlinJvm)
+    implementation(Libraries.kotlinCoroutines)
+    implementation(Libraries.appCompat)
     implementation(Libraries.material)
     implementation(Libraries.recyclerView)
     implementation(Libraries.timber)

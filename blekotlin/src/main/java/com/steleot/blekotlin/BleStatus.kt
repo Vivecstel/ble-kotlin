@@ -2,15 +2,15 @@ package com.steleot.blekotlin
 
 sealed class BleStatus {
 
-    class NotStarted: BleStatus()
+    object NotStarted : BleStatus()
 
-    class BluetoothNotAvailable: BleStatus()
+    object BluetoothNotAvailable: BleStatus()
 
-    class LocationPermissionNotGranted: BleStatus()
+    object BluetoothPermissionNotGranted: BleStatus()
 
-    class BluetoothNotEnabled: BleStatus()
+    object BluetoothAdminPermissionNotGranted: BleStatus()
 
-    class LocationServicesNotEnabled: BleStatus()
+    object BluetoothNotEnabled: BleStatus()
 
-    class Ready: BleStatus()
+    object LocationPermissionNotGranted: BleStatus()
 }

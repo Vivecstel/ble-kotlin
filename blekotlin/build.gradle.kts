@@ -38,7 +38,6 @@ dependencies {
 
     implementation(Libraries.kotlinJvm)
     implementation(Libraries.kotlinCoroutines)
-    implementation(Libraries.coreKtx)
 
     testImplementation(TestLibraries.junit)
     androidTestImplementation(TestLibraries.androidJunit)
