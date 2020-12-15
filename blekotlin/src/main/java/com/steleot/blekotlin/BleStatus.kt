@@ -15,4 +15,8 @@ sealed class BleStatus {
     object BluetoothAdminPermissionNotGranted: BleStatus()
 
     object LocationPermissionNotGranted: BleStatus()
+
+    object BluetoothWasClosed: BleStatus()
+
+    object BluetoothWasEnabled: BleStatus()
 }

@@ -26,16 +26,25 @@ class SampleViewModel: ViewModel() {
                         Timber.d("Bluetooth not enabled")
                     is BleStatus.LocationPermissionNotGranted ->
                         Timber.d("Location Permission not granted")
-                    else -> {
-                        Timber.d("Ble is ready")
-                        BleClient.startBleScan()
-                    }
+                    is BleStatus.BluetoothWasClosed ->
+                        Timber.d("Bluetooth was closed")
+                    is BleStatus.BluetoothWasEnabled ->
+                        Timber.d("Bluetooth was enabled")
                 }
             }
         }
     }
 
     fun startScanning() {
-        BleClient.startBleScan()
+        viewModelScope.launch {
+            BleClient.startBleScan().collect {
+                it?.let {
+                    val device = it.first
+                    Timber
+                        .tag("STELIOS")
+                        .d("BLE device with: name ${device.name}, address ${device.address} and rssi ${it.second}")
+                }
+            }
+        }
     }
 }

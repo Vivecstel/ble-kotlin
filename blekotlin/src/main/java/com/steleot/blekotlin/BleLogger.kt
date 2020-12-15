@@ -10,7 +10,7 @@ interface BleLogger {
     )
 }
 
-class DefaultBleLogger: BleLogger {
+internal class DefaultBleLogger: BleLogger {
 
     override fun log(
             tag: String,

@@ -7,19 +7,28 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.IntentFilter
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.lang.ref.WeakReference
 
 private const val TAG = "BleKotlin"
 
-object BleClient {
+@SuppressLint("MissingPermission")
+object BleClient : BleReceiver.BleReceiverCallbacks {
 
     private var weakContext: WeakReference<Context>? = null
     private lateinit var logger: BleLogger
+    private var useBleReceiver = true
     private var bluetoothAdapter: BluetoothAdapter? = null
     private lateinit var permissionChecker: BlePermissionChecker
+    private lateinit var bleReceiver: BroadcastReceiver
+    private var isScanning = false
+    private var lastFilter: List<ScanFilter>? = null
+    private var lastSettings: ScanSettings? = null
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(
@@ -29,8 +38,9 @@ object BleClient {
             with(result.device) {
                 logger.log(
                     TAG,
-                    "BLE device with address : ${this.address} with rssi : ${result.rssi}"
+                    "BLE device with: name $name, address $address and rssi ${result.rssi}"
                 )
+                _devices.value = this to result.rssi
             }
         }
 
@@ -50,6 +60,8 @@ object BleClient {
     private val _status: MutableStateFlow<BleStatus> = MutableStateFlow(BleStatus.NotStarted)
     val status = _status.asStateFlow()
 
+    private val _devices: MutableStateFlow<BleDevice?> = MutableStateFlow(null)
+
     fun init(
         context: Context,
         config: BleConfig = BleConfig()
@@ -57,16 +69,28 @@ object BleClient {
         val applicationContext = context.applicationContext
         weakContext = WeakReference(applicationContext)
         logger = config.logger
+        useBleReceiver = config.useBleReceiver
         val bluetoothManager = context
-                .getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
+            .getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
         bluetoothAdapter = bluetoothManager?.adapter
         permissionChecker = BlePermissionChecker(applicationContext)
     }
 
-    @SuppressLint("MissingPermission")
     fun startBleScan(
         filters: List<ScanFilter>? = null,
-        settings: ScanSettings? = ScanSettings.Builder().build()
+        settings: ScanSettings = ScanSettings.Builder().build()
+    ): StateFlow<BleDevice?> {
+        if (isScanning) {
+            logger.log(TAG, "Ble is already scanning")
+        } else {
+            startBleScanInternal(filters, settings)
+        }
+        return _devices.asStateFlow()
+    }
+
+    private fun startBleScanInternal(
+        filters: List<ScanFilter>?,
+        settings: ScanSettings
     ) {
         if (bluetoothAdapter == null) {
             logger.log(TAG, "Bluetooth not available on device.")
@@ -105,6 +129,52 @@ object BleClient {
         }
 
         logger.log(TAG, "Ble scan started.")
+        if (useBleReceiver) {
+            if (!isScanning) registerReceiver()
+            lastFilter = filters
+            lastSettings = settings
+        }
+        isScanning = true
         bluetoothAdapter!!.bluetoothLeScanner!!.startScan(filters, settings, scanCallback)
+    }
+
+    private fun registerReceiver() {
+        bleReceiver = BleReceiver(logger, this)
+        weakContext?.get()?.registerReceiver(
+            bleReceiver, IntentFilter((BluetoothAdapter.ACTION_STATE_CHANGED))
+        )
+    }
+
+    fun stopBleScan() {
+        isScanning = false
+        lastFilter = null
+        lastSettings = null
+        if (useBleReceiver) unregisterReceiver()
+        stopBleScanInternal()
+    }
+
+    private fun stopBleScanInternal() {
+        logger.log(TAG, "Stopping Ble scanning")
+        bluetoothAdapter!!.bluetoothLeScanner!!.stopScan(scanCallback)
+    }
+
+    private fun unregisterReceiver() {
+        weakContext?.get()?.unregisterReceiver(bleReceiver)
+    }
+
+    override fun bluetoothStatus(
+        isEnabled: Boolean
+    ) {
+        if (isEnabled) {
+            logger.log(TAG, "Bluetooth was enabled.")
+            _status.value = BleStatus.BluetoothWasEnabled
+            if (isScanning) {
+                startBleScanInternal(lastFilter, lastSettings!!)
+            }
+        } else {
+            logger.log(TAG, "Bluetooth was closed.")
+            _status.value = BleStatus.BluetoothWasClosed
+            stopBleScanInternal()
+        }
     }
 }

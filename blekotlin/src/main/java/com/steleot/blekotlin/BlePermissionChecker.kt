@@ -6,7 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Process
 
-class BlePermissionChecker(
+internal class BlePermissionChecker(
     private val context: Context
 ) {
 
