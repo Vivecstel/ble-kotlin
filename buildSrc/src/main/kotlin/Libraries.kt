@@ -2,7 +2,22 @@ object Libraries {
 
     const val kotlinJvm = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}"
     const val kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
+
+    /* https://developer.android.com/jetpack/androidx/releases/activity */
+    const val activityKtx = "androidx.activity:activity-ktx:${Versions.activity}"
+
+    /* https://developer.android.com/jetpack/androidx/releases/fragment */
+    const val fragmentKtx = "androidx.fragment:fragment-ktx:${Versions.fragment}"
+
+    /* https://developer.android.com/jetpack/androidx/releases/core */
+    const val coreKtx = "androidx.core:core-ktx:${Versions.core}"
+
+    /* https://developer.android.com/jetpack/androidx/releases/appcompat */
     const val appCompat = "androidx.appcompat:appcompat:${Versions.appCompat}"
+
+    /* https://developer.android.com/jetpack/androidx/releases/lifecycle */
+    const val lifecycleViewModelKtx =
+        "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycle}"
 
     /* https://github.com/material-components/material-components-android */
     const val material = "com.google.android.material:material:${Versions.material}"

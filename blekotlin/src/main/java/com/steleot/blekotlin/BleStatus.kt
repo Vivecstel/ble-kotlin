@@ -6,11 +6,13 @@ sealed class BleStatus {
 
     object BluetoothNotAvailable: BleStatus()
 
+    object BleNotSupported: BleStatus()
+
     object BluetoothPermissionNotGranted: BleStatus()
 
-    object BluetoothAdminPermissionNotGranted: BleStatus()
-
     object BluetoothNotEnabled: BleStatus()
+
+    object BluetoothAdminPermissionNotGranted: BleStatus()
 
     object LocationPermissionNotGranted: BleStatus()
 }
