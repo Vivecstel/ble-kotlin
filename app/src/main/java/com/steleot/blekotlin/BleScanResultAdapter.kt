@@ -2,6 +2,7 @@ package com.steleot.blekotlin
 
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -16,8 +17,24 @@ class BleScanResultAdapter:
         parent: ViewGroup,
         viewType: Int
     ): ItemViewHolder {
-        return ItemViewHolder(ItemBleScanResultBinding
-            .inflate(LayoutInflater.from(parent.context), parent, false))
+        return ItemViewHolder(
+            ItemBleScanResultBinding
+                .inflate(LayoutInflater.from(parent.context), parent, false)
+        )
+    }
+
+    override fun onBindViewHolder(
+        holder: ItemViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        if (payloads.isNotEmpty()) {
+            val bundle = payloads[0] as Bundle
+            val rssi = bundle.getInt("rssi")
+            holder.updateRssi(rssi)
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
     }
 
     override fun onBindViewHolder(
@@ -27,17 +44,24 @@ class BleScanResultAdapter:
         holder.bind(getItem(position))
     }
 
+    @SuppressLint("SetTextI18n")
     class ItemViewHolder(
         private val binding: ItemBleScanResultBinding
     ): RecyclerView.ViewHolder(binding.root) {
 
-        @SuppressLint("SetTextI18n")
         fun bind(scanResult: ScanResult) {
             val device = scanResult.device
             val rssi = scanResult.rssi
             binding.bleName.text =
                 "Ble Device: ${if (device.name != null) device.name else "not available"}"
             binding.bleAddress.text = "Ble Address: ${device.address}"
+            updateRssi(rssi)
+
+        }
+
+        fun updateRssi(
+            rssi: Int
+        ) {
             binding.bleRssi.text = "Ble rssi: ${rssi}"
         }
     }
@@ -59,5 +83,14 @@ object DiffCallback: DiffUtil.ItemCallback<ScanResult>() {
         newItem: ScanResult
     ): Boolean {
         return oldItem.rssi == newItem.rssi
+    }
+
+    override fun getChangePayload(
+        oldItem: ScanResult,
+        newItem: ScanResult
+    ): Any {
+        return Bundle().apply {
+            putInt("rssi", newItem.rssi)
+        }
     }
 }

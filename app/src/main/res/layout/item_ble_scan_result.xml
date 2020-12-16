@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="16dp"
+    android:layout_margin="8dp"
     android:elevation="5dp"
-    app:cardCornerRadius="4dp"
-    android:background="?android:colorPrimary">
+    app:cardBackgroundColor="?android:colorPrimary"
+    app:cardCornerRadius="4dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="50dp"
-        android:padding="16dp" >
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/ble_rssi"
@@ -22,6 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
+            android:textColor="?android:textColorPrimaryInverse"
             tools:text="Ble Rssi" />
 
         <TextView
@@ -32,6 +34,7 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_toStartOf="@id/ble_rssi"
+            android:textColor="?android:textColorPrimaryInverse"
             tools:text="Ble Device" />
 
         <TextView
@@ -39,10 +42,11 @@
             style="@style/TextAppearance.AppCompat.Caption"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
             android:layout_below="@id/ble_name"
-            android:layout_toStartOf="@id/ble_rssi"
+            android:layout_alignParentStart="true"
             android:layout_marginTop="4dp"
+            android:layout_toStartOf="@id/ble_rssi"
+            android:textColor="?android:textColorPrimaryInverse"
             tools:text="Ble Address" />
 
     </RelativeLayout>

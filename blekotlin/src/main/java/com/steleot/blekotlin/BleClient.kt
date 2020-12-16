@@ -13,6 +13,7 @@ import android.content.IntentFilter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
 import java.lang.ref.WeakReference
 
 private const val TAG = "BleKotlin"

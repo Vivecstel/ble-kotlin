@@ -55,7 +55,9 @@ class SampleViewModel: ViewModel() {
                     } else {
                         list.add(scanResult)
                     }
-                    _results.value = list.toList()
+                    _results.value = list
+                        /* .sortedBy { it.rssi } */
+                        .toList()
                 } else {
                     _results.value = listOf()
                 }
