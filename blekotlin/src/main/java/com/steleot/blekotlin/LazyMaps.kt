@@ -1,7 +1,13 @@
 package com.steleot.blekotlin
 
-import android.bluetooth.BluetoothAdapter.*
-import android.bluetooth.le.ScanCallback.*
+import android.bluetooth.BluetoothAdapter.STATE_OFF
+import android.bluetooth.BluetoothAdapter.STATE_ON
+import android.bluetooth.BluetoothAdapter.STATE_TURNING_OFF
+import android.bluetooth.BluetoothAdapter.STATE_TURNING_ON
+import android.bluetooth.le.ScanCallback.SCAN_FAILED_ALREADY_STARTED
+import android.bluetooth.le.ScanCallback.SCAN_FAILED_APPLICATION_REGISTRATION_FAILED
+import android.bluetooth.le.ScanCallback.SCAN_FAILED_FEATURE_UNSUPPORTED
+import android.bluetooth.le.ScanCallback.SCAN_FAILED_INTERNAL_ERROR
 
 val bluetoothStatuses by lazy {
     mapOf(

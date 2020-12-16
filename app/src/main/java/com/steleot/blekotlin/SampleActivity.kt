@@ -7,7 +7,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import com.steleot.blekotlin.databinding.ActivitySampleBinding
 import timber.log.Timber
 
@@ -47,7 +46,7 @@ class SampleActivity : AppCompatActivity() {
     }
 
     private fun initRecyclerView() {
-        val adapter = BleScanResultAdapter()
+        val adapter = BleScanResultAdapter(viewModel)
         binding.recyclerView.adapter = adapter
         viewModel.results.observe(this, {
             adapter.submitList(it)

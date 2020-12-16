@@ -8,14 +8,12 @@ plugins {
 }
 
 buildscript {
-    val kotlin_version by extra("1.4.20")
     repositories {
         google()
         jcenter()
     }
     dependencies {
         classpath(GradleLibraries.androidPlugin)
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
     }
 }
 

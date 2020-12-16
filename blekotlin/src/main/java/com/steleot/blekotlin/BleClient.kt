@@ -2,7 +2,10 @@ package com.steleot.blekotlin
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
@@ -13,7 +16,6 @@ import android.content.IntentFilter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
 import java.lang.ref.WeakReference
 
 private const val TAG = "BleKotlin"
@@ -55,9 +57,70 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
         }
     }
 
+    private val gattCallback = object : BluetoothGattCallback() {
+
+        override fun onConnectionStateChange(
+            gatt: BluetoothGatt,
+            status: Int,
+            newState: Int
+        ) { // todo statuses
+            val deviceAddress = gatt.device.address
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                if (newState == BluetoothProfile.STATE_CONNECTED) {
+                    stopBleScanInternal()
+                    logger.log("BluetoothGattCallback", "Successfully connected to $deviceAddress")
+                    // TODO: Store a reference to BluetoothGatt
+                    gatt.discoverServices()
+                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                    logger.log(
+                        "BluetoothGattCallback",
+                        "Successfully disconnected from $deviceAddress"
+                    )
+                    gatt.close()
+                }
+            } else {
+                logger.log(TAG, "Error $status encountered for $deviceAddress! Disconnecting...")
+                gatt.close()
+            }
+        }
+
+        override fun onServicesDiscovered(
+            gatt: BluetoothGatt,
+            status: Int
+        ) {
+            with(gatt) {
+                logger.log(
+                    "BluetoothGattCallback",
+                    "Discovered ${services.size} services for ${device.address}"
+                )
+                printGattTable() // See implementation just above this section
+                // Consider connection setup as complete here
+            }
+        }
+    }
+
+    private fun BluetoothGatt.printGattTable() { // todo remove
+        if (services.isEmpty()) {
+            logger.log(
+                "printGattTable",
+                "No service and characteristic available, call discoverServices() first?"
+            )
+            return
+        }
+        services.forEach { service ->
+            val characteristicsTable = service.characteristics.joinToString(
+                separator = "\n|--",
+                prefix = "|--"
+            ) { it.uuid.toString() }
+            logger.log(
+                "printGattTable",
+                "\nService ${service.uuid}\nCharacteristics:\n$characteristicsTable"
+            )
+        }
+    }
+
     private val _status: MutableStateFlow<BleStatus> = MutableStateFlow(BleStatus.NotStarted)
     val status = _status.asStateFlow()
-
     private val _bleDevice: MutableStateFlow<BleScanResult?> = MutableStateFlow(null)
 
     fun init(
@@ -90,50 +153,42 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
         filters: List<ScanFilter>?,
         settings: ScanSettings
     ) {
-        if (bluetoothAdapter == null) {
-            logger.log(TAG, "Bluetooth not available on device.")
-            _status.value = BleStatus.BluetoothNotAvailable
-            return
+        when {
+            bluetoothAdapter == null -> {
+                logger.log(TAG, "Bluetooth not available on device.")
+                _status.value = BleStatus.BluetoothNotAvailable
+            }
+            weakContext?.get()?.isBleSupported() == false -> {
+                logger.log(TAG, "Bluetooth not supported.")
+                _status.value = BleStatus.BleNotSupported
+            }
+            !permissionChecker.isBluetoothPermissionGranted() -> {
+                logger.log(TAG, "Bluetooth permission is not granted.")
+                _status.value = BleStatus.BluetoothPermissionNotGranted
+            }
+            !bluetoothAdapter!!.isEnabled -> {
+                logger.log(TAG, "Bluetooth is not enabled on device.")
+                _status.value = BleStatus.BluetoothNotEnabled
+            }
+            !permissionChecker.isBluetoothAdminPermissionGranted() -> {
+                logger.log(TAG, "Bluetooth admin permission is not granted.")
+                _status.value = BleStatus.BluetoothAdminPermissionNotGranted
+            }
+            !permissionChecker.isLocationPermissionGranted() -> {
+                logger.log(TAG, "Location permission is not granted.")
+                _status.value = BleStatus.LocationPermissionNotGranted
+            }
+            else -> {
+                logger.log(TAG, "Ble scan started.")
+                if (useBleReceiver) {
+                    if (!isScanning) registerReceiver()
+                    lastFilter = filters
+                    lastSettings = settings
+                }
+                isScanning = true
+                bluetoothAdapter!!.bluetoothLeScanner!!.startScan(filters, settings, scanCallback)
+            }
         }
-
-        if (weakContext?.get()?.isBleSupported() == false) {
-            logger.log(TAG, "Bluetooth not supported.")
-            _status.value = BleStatus.BleNotSupported
-            return
-        }
-
-        if (!permissionChecker.isBluetoothPermissionGranted()) {
-            logger.log(TAG, "Bluetooth permission is not granted.")
-            _status.value = BleStatus.BluetoothPermissionNotGranted
-            return
-        }
-
-        if (!bluetoothAdapter!!.isEnabled) {
-            logger.log(TAG, "Bluetooth is not enabled on device.")
-            _status.value = BleStatus.BluetoothNotEnabled
-            return
-        }
-
-        if (!permissionChecker.isBluetoothAdminPermissionGranted()) {
-            logger.log(TAG, "Bluetooth admin permission is not granted.")
-            _status.value = BleStatus.BluetoothAdminPermissionNotGranted
-            return
-        }
-
-        if (!permissionChecker.isLocationPermissionGranted()) {
-            logger.log(TAG, "Location permission is not granted.")
-            _status.value = BleStatus.LocationPermissionNotGranted
-            return
-        }
-
-        logger.log(TAG, "Ble scan started.")
-        if (useBleReceiver) {
-            if (!isScanning) registerReceiver()
-            lastFilter = filters
-            lastSettings = settings
-        }
-        isScanning = true
-        bluetoothAdapter!!.bluetoothLeScanner!!.startScan(filters, settings, scanCallback)
     }
 
     private fun registerReceiver() {
@@ -173,6 +228,15 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
             logger.log(TAG, "Bluetooth was closed.")
             _status.value = BleStatus.BluetoothWasClosed
             stopBleScanInternal()
+        }
+    }
+
+    fun connectTo(
+        device: BleDevice,
+        autoConnect: Boolean = false
+    ) {
+        weakContext?.get()?.let { context ->
+            device.connectGatt(context, autoConnect, gattCallback)
         }
     }
 }

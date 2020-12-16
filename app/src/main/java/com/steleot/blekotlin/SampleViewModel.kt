@@ -56,12 +56,18 @@ class SampleViewModel: ViewModel() {
                         list.add(scanResult)
                     }
                     _results.value = list
-                        /* .sortedBy { it.rssi } */
+                        /*.sortedBy { it.rssi }*/
                         .toList()
                 } else {
                     _results.value = listOf()
                 }
             }
         }
+    }
+
+    fun handleDevice(
+        bleDevice: BleDevice
+    ) {
+        BleClient.connectTo(bleDevice)
     }
 }

@@ -34,8 +34,8 @@ internal class BleReceiver(
             BluetoothAdapter.ERROR
         )
         logger.log(
-            TAG, "Previous state is ${bluetoothStatuses.getOrElse(previousState) { UNKNOWN_STATUS }} " +
-                    "and next state is ${bluetoothStatuses.getOrElse(nextState) { UNKNOWN_STATUS }}"
+            TAG, "Previous state is $previousState ${bluetoothStatuses.getOrElse(previousState) { UNKNOWN_STATUS }} " +
+                    "and next state is $nextState ${bluetoothStatuses.getOrElse(nextState) { UNKNOWN_STATUS }}"
         )
 
         if (nextState == BluetoothAdapter.STATE_ON) {

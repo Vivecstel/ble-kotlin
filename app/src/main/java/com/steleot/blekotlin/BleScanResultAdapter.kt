@@ -10,8 +10,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.steleot.blekotlin.databinding.ItemBleScanResultBinding
 
-class BleScanResultAdapter:
-    ListAdapter<ScanResult, BleScanResultAdapter.ItemViewHolder>(DiffCallback) {
+class BleScanResultAdapter(
+    private val viewModel: SampleViewModel
+): ListAdapter<ScanResult, BleScanResultAdapter.ItemViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -41,7 +42,11 @@ class BleScanResultAdapter:
         holder: ItemViewHolder,
         position: Int
     ) {
-        holder.bind(getItem(position))
+        val scanResult = getItem(position)
+        holder.bind(scanResult)
+        holder.itemView.setOnClickListener {
+            viewModel.handleDevice(scanResult.device)
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -49,14 +54,15 @@ class BleScanResultAdapter:
         private val binding: ItemBleScanResultBinding
     ): RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(scanResult: ScanResult) {
+        fun bind(
+            scanResult: ScanResult
+        ) {
             val device = scanResult.device
             val rssi = scanResult.rssi
             binding.bleName.text =
                 "Ble Device: ${if (device.name != null) device.name else "not available"}"
             binding.bleAddress.text = "Ble Address: ${device.address}"
             updateRssi(rssi)
-
         }
 
         fun updateRssi(
