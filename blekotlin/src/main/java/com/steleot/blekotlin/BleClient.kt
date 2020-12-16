@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.lang.ref.WeakReference
 
 private const val TAG = "BleKotlin"
+private const val UNKNOWN_ERROR = "Unknown error"
 
 @SuppressLint("MissingPermission")
 object BleClient : BleReceiver.BleReceiverCallbacks {
@@ -35,13 +36,7 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
             callbackType: Int,
             result: ScanResult
         ) {
-            with(result.device) {
-                logger.log(
-                    TAG,
-                    "BLE device with: name $name, address $address and rssi ${result.rssi}"
-                )
-                _devices.value = this to result.rssi
-            }
+            _bleDevice.value = result to 0
         }
 
         override fun onBatchScanResults(
@@ -53,14 +48,16 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
         override fun onScanFailed(
             errorCode: Int
         ) {
-            // todo
+            logger.log(
+                TAG, "Error code ${scanCallbackStatuses.getOrElse(errorCode) { UNKNOWN_ERROR }}"
+            )
         }
     }
 
     private val _status: MutableStateFlow<BleStatus> = MutableStateFlow(BleStatus.NotStarted)
     val status = _status.asStateFlow()
 
-    private val _devices: MutableStateFlow<BleDevice?> = MutableStateFlow(null)
+    private val _bleDevice: MutableStateFlow<BleScanResult?> = MutableStateFlow(null)
 
     fun init(
         context: Context,
@@ -79,13 +76,13 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
     fun startBleScan(
         filters: List<ScanFilter>? = null,
         settings: ScanSettings = ScanSettings.Builder().build()
-    ): StateFlow<BleDevice?> {
+    ): StateFlow<BleScanResult?> {
         if (isScanning) {
             logger.log(TAG, "Ble is already scanning")
         } else {
             startBleScanInternal(filters, settings)
         }
-        return _devices.asStateFlow()
+        return _bleDevice.asStateFlow()
     }
 
     private fun startBleScanInternal(

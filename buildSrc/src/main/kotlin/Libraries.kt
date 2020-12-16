@@ -18,6 +18,8 @@ object Libraries {
     /* https://developer.android.com/jetpack/androidx/releases/lifecycle */
     const val lifecycleViewModelKtx =
         "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycle}"
+    const val lifecycleLiveDataKtx =
+        "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycle}"
 
     /* https://github.com/material-components/material-components-android */
     const val material = "com.google.android.material:material:${Versions.material}"

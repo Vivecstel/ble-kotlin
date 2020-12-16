@@ -33,6 +33,9 @@ android {
     lintOptions {
         isAbortOnError = true
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -44,6 +47,7 @@ dependencies {
     implementation(Libraries.coreKtx)
     implementation(Libraries.appCompat)
     implementation(Libraries.lifecycleViewModelKtx)
+    implementation(Libraries.lifecycleLiveDataKtx)
     implementation(Libraries.material)
     implementation(Libraries.recyclerView)
     implementation(Libraries.timber)

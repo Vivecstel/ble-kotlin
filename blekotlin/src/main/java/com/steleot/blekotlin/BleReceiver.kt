@@ -6,20 +6,12 @@ import android.content.Context
 import android.content.Intent
 
 private const val TAG = "BluetoothReceiver"
+private const val UNKNOWN_STATUS = "Unknown status"
 
 internal class BleReceiver(
     private val logger: BleLogger,
     private val callbacks: BleReceiverCallbacks
 ) : BroadcastReceiver() {
-
-    private val bluetoothStatuses by lazy {
-        mapOf(
-            BluetoothAdapter.STATE_OFF to "Bluetooth state off",
-            BluetoothAdapter.STATE_TURNING_ON to "Bluetooth state turning on",
-            BluetoothAdapter.STATE_ON to "Bluetooth state on",
-            BluetoothAdapter.STATE_TURNING_OFF to "Bluetooth state turning off"
-        )
-    }
 
     override fun onReceive(
         context: Context,
@@ -42,8 +34,8 @@ internal class BleReceiver(
             BluetoothAdapter.ERROR
         )
         logger.log(
-            TAG, "Previous state is ${bluetoothStatuses[previousState]} " +
-                    "and next state is ${bluetoothStatuses[nextState]}"
+            TAG, "Previous state is ${bluetoothStatuses.getOrElse(previousState) { UNKNOWN_STATUS }} " +
+                    "and next state is ${bluetoothStatuses.getOrElse(nextState) { UNKNOWN_STATUS }}"
         )
 
         if (nextState == BluetoothAdapter.STATE_ON) {

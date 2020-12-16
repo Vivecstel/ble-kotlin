@@ -7,11 +7,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import com.steleot.blekotlin.databinding.ActivitySampleBinding
 import timber.log.Timber
 
 class SampleActivity : AppCompatActivity() {
 
-    private val model: SampleViewModel by viewModels()
+    private val viewModel: SampleViewModel by viewModels()
     private val requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -21,11 +23,14 @@ class SampleActivity : AppCompatActivity() {
             Timber.d("Permission not granted")
         }
     }
+    private lateinit var binding: ActivitySampleBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sample)
+        binding = ActivitySampleBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         handlePermissions()
+        initRecyclerView()
     }
 
     private fun handlePermissions() {
@@ -36,8 +41,16 @@ class SampleActivity : AppCompatActivity() {
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
             else -> {
-                model.startScanning()
+                viewModel.startScanning()
             }
         }
+    }
+
+    private fun initRecyclerView() {
+        val adapter = BleScanResultAdapter()
+        binding.recyclerView.adapter = adapter
+        viewModel.results.observe(this, {
+            adapter.submitList(it)
+        })
     }
 }

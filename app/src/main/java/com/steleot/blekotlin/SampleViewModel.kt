@@ -1,5 +1,8 @@
 package com.steleot.blekotlin
 
+import android.bluetooth.le.ScanResult
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.collect
@@ -7,6 +10,9 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class SampleViewModel: ViewModel() {
+
+    private val _results = MutableLiveData<List<ScanResult>>()
+    val results: LiveData<List<ScanResult>> = _results
 
     init {
         viewModelScope.launch {
@@ -37,12 +43,21 @@ class SampleViewModel: ViewModel() {
 
     fun startScanning() {
         viewModelScope.launch {
-            BleClient.startBleScan().collect {
-                it?.let {
-                    val device = it.first
-                    Timber
-                        .tag("STELIOS")
-                        .d("BLE device with: name ${device.name}, address ${device.address} and rssi ${it.second}")
+            BleClient.startBleScan().collect { bleScanResult ->
+                if (bleScanResult != null && bleScanResult.second == 0) {
+                    val scanResult = bleScanResult.first
+                    val index = _results.value!!.indexOfFirst { result ->
+                        result.device.address == scanResult.device.address
+                    }
+                    val list = _results.value!!.toMutableList()
+                    if (index != -1) {
+                        list[index] = scanResult
+                    } else {
+                        list.add(scanResult)
+                    }
+                    _results.value = list.toList()
+                } else {
+                    _results.value = listOf()
                 }
             }
         }
