@@ -4,19 +4,19 @@ sealed class BleStatus {
 
     object NotStarted : BleStatus()
 
-    object BluetoothNotAvailable: BleStatus()
+    object BluetoothNotAvailable : BleStatus()
 
-    object BleNotSupported: BleStatus()
+    object BleNotSupported : BleStatus()
 
-    object BluetoothPermissionNotGranted: BleStatus()
+    object BluetoothPermissionNotGranted : BleStatus()
 
-    object BluetoothNotEnabled: BleStatus()
+    object BluetoothNotEnabled : BleStatus()
 
-    object BluetoothAdminPermissionNotGranted: BleStatus()
+    object BluetoothAdminPermissionNotGranted : BleStatus()
 
-    object LocationPermissionNotGranted: BleStatus()
+    object LocationPermissionNotGranted : BleStatus()
 
-    object BluetoothWasClosed: BleStatus()
+    object BluetoothWasClosed : BleStatus()
 
-    object BluetoothWasEnabled: BleStatus()
+    object BluetoothWasEnabled : BleStatus()
 }

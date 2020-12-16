@@ -2,6 +2,8 @@ package com.steleot.blekotlin
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothAdapter.ACTION_STATE_CHANGED
+import android.bluetooth.BluetoothDevice.ACTION_BOND_STATE_CHANGED
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothManager
@@ -13,17 +15,24 @@ import android.bluetooth.le.ScanSettings
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
+/**
+ * Logger tag constant.
+ */
 private const val TAG = "BleKotlin"
-private const val UNKNOWN_ERROR = "Unknown error"
 
 @SuppressLint("MissingPermission")
 object BleClient : BleReceiver.BleReceiverCallbacks {
 
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private var weakContext: WeakReference<Context>? = null
     private lateinit var logger: BleLogger
     private var useBleReceiver = true
@@ -33,6 +42,7 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
     private var isScanning = false
     private var lastFilter: List<ScanFilter>? = null
     private var lastSettings: ScanSettings? = null
+    private var bleGatt: BluetoothGatt? = null
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(
@@ -52,7 +62,8 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
             errorCode: Int
         ) {
             logger.log(
-                TAG, "Error code ${scanCallbackStatuses.getOrElse(errorCode) { UNKNOWN_ERROR }}"
+                TAG,
+                "Error code $errorCode ${scanCallbackStatuses.getOrElse(errorCode) { UNKNOWN_ERROR }}"
             )
         }
     }
@@ -63,14 +74,13 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
             gatt: BluetoothGatt,
             status: Int,
             newState: Int
-        ) { // todo statuses
+        ) {
             val deviceAddress = gatt.device.address
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
-                    stopBleScanInternal()
                     logger.log("BluetoothGattCallback", "Successfully connected to $deviceAddress")
-                    // TODO: Store a reference to BluetoothGatt
-                    gatt.discoverServices()
+                    bleGatt = gatt
+                    coroutineScope.launch { gatt.discoverServices() }
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     logger.log(
                         "BluetoothGattCallback",
@@ -79,8 +89,12 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
                     gatt.close()
                 }
             } else {
-                logger.log(TAG, "Error $status encountered for $deviceAddress! Disconnecting...")
+                logger.log(
+                    TAG, "Error $status ${gattStatuses.getOrElse(status) { UNKNOWN_STATUS }}" +
+                            " encountered for $deviceAddress. Disconnecting device.."
+                )
                 gatt.close()
+                if (isScanning) startBleScanInternal(lastFilter, lastSettings!!)
             }
         }
 
@@ -93,29 +107,7 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
                     "BluetoothGattCallback",
                     "Discovered ${services.size} services for ${device.address}"
                 )
-                printGattTable() // See implementation just above this section
-                // Consider connection setup as complete here
             }
-        }
-    }
-
-    private fun BluetoothGatt.printGattTable() { // todo remove
-        if (services.isEmpty()) {
-            logger.log(
-                "printGattTable",
-                "No service and characteristic available, call discoverServices() first?"
-            )
-            return
-        }
-        services.forEach { service ->
-            val characteristicsTable = service.characteristics.joinToString(
-                separator = "\n|--",
-                prefix = "|--"
-            ) { it.uuid.toString() }
-            logger.log(
-                "printGattTable",
-                "\nService ${service.uuid}\nCharacteristics:\n$characteristicsTable"
-            )
         }
     }
 
@@ -194,7 +186,10 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
     private fun registerReceiver() {
         bleReceiver = BleReceiver(logger, this)
         weakContext?.get()?.registerReceiver(
-            bleReceiver, IntentFilter((BluetoothAdapter.ACTION_STATE_CHANGED))
+            bleReceiver, IntentFilter().apply {
+                addAction(ACTION_STATE_CHANGED)
+                addAction(ACTION_BOND_STATE_CHANGED)
+            }
         )
     }
 
@@ -235,8 +230,13 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
         device: BleDevice,
         autoConnect: Boolean = false
     ) {
+        bleGatt = null
+        stopBleScanInternal()
         weakContext?.get()?.let { context ->
-            device.connectGatt(context, autoConnect, gattCallback)
+            coroutineScope.launch {
+                delay(CONNECT_DELAY)
+                device.connectGatt(context, autoConnect, gattCallback)
+            }
         }
     }
 }

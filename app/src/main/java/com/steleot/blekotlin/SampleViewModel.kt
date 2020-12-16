@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class SampleViewModel: ViewModel() {
+class SampleViewModel : ViewModel() {
 
     private val _results = MutableLiveData<List<ScanResult>>()
     val results: LiveData<List<ScanResult>> = _results

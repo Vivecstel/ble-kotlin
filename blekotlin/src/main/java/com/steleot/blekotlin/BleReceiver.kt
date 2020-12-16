@@ -1,12 +1,16 @@
 package com.steleot.blekotlin
 
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothAdapter.ACTION_STATE_CHANGED
+import android.bluetooth.BluetoothDevice.ACTION_BOND_STATE_CHANGED
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 
+/**
+ * Logger tag constant.
+ */
 private const val TAG = "BluetoothReceiver"
-private const val UNKNOWN_STATUS = "Unknown status"
 
 internal class BleReceiver(
     private val logger: BleLogger,
@@ -18,7 +22,8 @@ internal class BleReceiver(
         intent: Intent
     ) {
         when (intent.action) {
-            BluetoothAdapter.ACTION_STATE_CHANGED -> bluetoothStateChanged(intent)
+            ACTION_STATE_CHANGED -> bluetoothStateChanged(intent)
+            ACTION_BOND_STATE_CHANGED -> bluetoothBondStateChanged(intent)
         }
     }
 
@@ -34,7 +39,8 @@ internal class BleReceiver(
             BluetoothAdapter.ERROR
         )
         logger.log(
-            TAG, "Previous state is $previousState ${bluetoothStatuses.getOrElse(previousState) { UNKNOWN_STATUS }} " +
+            TAG,
+            "Previous state is $previousState ${bluetoothStatuses.getOrElse(previousState) { UNKNOWN_STATUS }} " +
                     "and next state is $nextState ${bluetoothStatuses.getOrElse(nextState) { UNKNOWN_STATUS }}"
         )
 
@@ -43,6 +49,12 @@ internal class BleReceiver(
         } else if (nextState == BluetoothAdapter.STATE_OFF) {
             callbacks.bluetoothStatus(false)
         }
+    }
+
+    private fun bluetoothBondStateChanged(
+        intent: Intent
+    ) {
+        // todo stleios
     }
 
     interface BleReceiverCallbacks {

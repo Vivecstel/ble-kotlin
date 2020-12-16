@@ -14,7 +14,7 @@ class SampleActivity : AppCompatActivity() {
 
     private val viewModel: SampleViewModel by viewModels()
     private val requestPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
+        ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
             handlePermissions()
@@ -35,7 +35,7 @@ class SampleActivity : AppCompatActivity() {
     private fun handlePermissions() {
         when {
             ContextCompat
-                    .checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                .checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
                     PackageManager.PERMISSION_GRANTED -> {
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }

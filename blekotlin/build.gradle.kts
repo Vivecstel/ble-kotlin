@@ -38,6 +38,7 @@ dependencies {
 
     implementation(Libraries.kotlinJvm)
     implementation(Libraries.kotlinCoroutines)
+    implementation(Libraries.kotlinCoroutinesAndroid)
 
     testImplementation(TestLibraries.junit)
     androidTestImplementation(TestLibraries.androidJunit)

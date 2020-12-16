@@ -5,12 +5,13 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Process
+import java.lang.ref.WeakReference
 
 internal class BlePermissionChecker(
-    private val context: Context
+    context: Context
 ) {
-
     private val targetSdkVersion = context.applicationInfo.targetSdkVersion
+    private val weakContext = WeakReference(context)
 
     fun isBluetoothPermissionGranted() =
         isPermissionGranted(Manifest.permission.BLUETOOTH)
@@ -33,7 +34,7 @@ internal class BlePermissionChecker(
     private fun isPermissionGranted(
         permission: String
     ): Boolean {
-        return context.checkPermission(
+        return weakContext.get()?.checkPermission(
             permission, Process.myPid(), Process.myUid()
         ) == PackageManager.PERMISSION_GRANTED
     }

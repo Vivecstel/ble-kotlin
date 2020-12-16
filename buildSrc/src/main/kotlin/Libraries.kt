@@ -1,7 +1,15 @@
 object Libraries {
 
+    /* https://kotlinlang.org/api/latest/jvm/stdlib/ */
     const val kotlinJvm = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}"
-    const val kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
+
+    /* https://github.com/Kotlin/kotlinx.coroutines */
+    const val kotlinCoroutines =
+        "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
+
+    /* https://developer.android.com/kotlin/coroutines */
+    const val kotlinCoroutinesAndroid =
+        "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}"
 
     /* https://developer.android.com/jetpack/androidx/releases/activity */
     const val activityKtx = "androidx.activity:activity-ktx:${Versions.activity}"

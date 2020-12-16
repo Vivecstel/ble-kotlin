@@ -12,7 +12,7 @@ import com.steleot.blekotlin.databinding.ItemBleScanResultBinding
 
 class BleScanResultAdapter(
     private val viewModel: SampleViewModel
-): ListAdapter<ScanResult, BleScanResultAdapter.ItemViewHolder>(DiffCallback) {
+) : ListAdapter<ScanResult, BleScanResultAdapter.ItemViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -52,7 +52,7 @@ class BleScanResultAdapter(
     @SuppressLint("SetTextI18n")
     class ItemViewHolder(
         private val binding: ItemBleScanResultBinding
-    ): RecyclerView.ViewHolder(binding.root) {
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(
             scanResult: ScanResult
@@ -73,7 +73,7 @@ class BleScanResultAdapter(
     }
 }
 
-object DiffCallback: DiffUtil.ItemCallback<ScanResult>() {
+object DiffCallback : DiffUtil.ItemCallback<ScanResult>() {
 
     override fun areItemsTheSame(
         oldItem: ScanResult,
