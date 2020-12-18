@@ -1,4 +1,4 @@
-package com.steleot.blekotlin.internal
+package com.steleot.blekotlin.internal.helper
 
 import android.util.Log
 import com.steleot.blekotlin.BleLogger

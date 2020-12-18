@@ -45,7 +45,7 @@ class SampleViewModel : ViewModel() {
         viewModelScope.launch {
             BleClient.startBleScan().collect { bleScanResult ->
                 if (bleScanResult != null && bleScanResult.second == 0) {
-                    val scanResult = bleScanResult.first
+                    val scanResult = bleScanResult.first!!
                     val index = _results.value!!.indexOfFirst { result ->
                         result.device.address == scanResult.device.address
                     }

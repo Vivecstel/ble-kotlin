@@ -5,24 +5,18 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothAdapter.ACTION_STATE_CHANGED
 import android.bluetooth.BluetoothDevice.ACTION_BOND_STATE_CHANGED
 import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothManager
-import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
-import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
-import com.steleot.blekotlin.internal.BlePermissionChecker
 import com.steleot.blekotlin.internal.CONNECT_DELAY
-import com.steleot.blekotlin.internal.UNKNOWN_ERROR
-import com.steleot.blekotlin.internal.UNKNOWN_STATUS
-import com.steleot.blekotlin.internal.gattStatuses
-import com.steleot.blekotlin.internal.isBleSupported
+import com.steleot.blekotlin.internal.callback.BleScanCallback
+import com.steleot.blekotlin.internal.helper.BlePermissionChecker
 import com.steleot.blekotlin.internal.receiver.EmptyBleReceiver
-import com.steleot.blekotlin.internal.scanCallbackStatuses
+import com.steleot.blekotlin.internal.utils.isBleSupported
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -32,13 +26,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
-/**
- * Logger tag constant.
- */
-private const val TAG = "BleKotlin"
-
 @SuppressLint("MissingPermission")
-object BleClient : BleReceiver.BleReceiverCallbacks {
+object BleClient : BleReceiver.BleReceiverListener {
+
+    /**
+     * Logger tag constant.
+     */
+    private const val TAG = "BleKotlin"
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private var weakContext: WeakReference<Context>? = null
@@ -50,92 +44,29 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
     private var isScanning = false
     private var lastFilter: List<ScanFilter>? = null
     private var lastSettings: ScanSettings? = null
+    private lateinit var scanCallback: ScanCallback
     private var bleGatt: BluetoothGatt? = null
-
-    private val scanCallback = object : ScanCallback() {
-        override fun onScanResult(
-            callbackType: Int,
-            result: ScanResult
-        ) {
-            _bleDevice.value = result to 0
-        }
-
-        override fun onBatchScanResults(
-            results: MutableList<ScanResult>?
-        ) {
-            /* empty implementation */
-        }
-
-        override fun onScanFailed(
-            errorCode: Int
-        ) {
-            logger.log(
-                TAG,
-                "Error code $errorCode ${scanCallbackStatuses.getOrElse(errorCode) { UNKNOWN_ERROR }}"
-            )
-        }
-    }
-
-    private val gattCallback = object : BluetoothGattCallback() {
-
-        override fun onConnectionStateChange(
-            gatt: BluetoothGatt,
-            status: Int,
-            newState: Int
-        ) {
-            val deviceAddress = gatt.device.address
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                if (newState == BluetoothProfile.STATE_CONNECTED) {
-                    logger.log("BluetoothGattCallback", "Successfully connected to $deviceAddress")
-                    bleGatt = gatt
-                    coroutineScope.launch { gatt.discoverServices() }
-                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                    logger.log(
-                        "BluetoothGattCallback",
-                        "Successfully disconnected from $deviceAddress"
-                    )
-                    gatt.close()
-                }
-            } else {
-                logger.log(
-                    TAG, "Error $status ${gattStatuses.getOrElse(status) { UNKNOWN_STATUS }}" +
-                            " encountered for $deviceAddress. Disconnecting device.."
-                )
-                gatt.close()
-                if (isScanning) startBleScanInternal(lastFilter, lastSettings!!)
-            }
-        }
-
-        override fun onServicesDiscovered(
-            gatt: BluetoothGatt,
-            status: Int
-        ) {
-            with(gatt) {
-                logger.log(
-                    "BluetoothGattCallback",
-                    "Discovered ${services.size} services for ${device.address}"
-                )
-            }
-        }
-    }
 
     private val _status: MutableStateFlow<BleStatus> = MutableStateFlow(BleStatus.NotStarted)
     val status = _status.asStateFlow()
-    private val _bleDevice: MutableStateFlow<BleScanResult?> = MutableStateFlow(null)
+    internal val bleDevice: MutableStateFlow<BleScanResult?> = MutableStateFlow(null)
 
     fun init(
         context: Context,
         config: BleConfig = BleConfig()
     ) {
+        /* from context */
         val applicationContext = context.applicationContext
         weakContext = WeakReference(applicationContext)
-        logger = config.logger
-        useBleReceiver = config.bleReceiver !is EmptyBleReceiver
-        bleReceiver = config.bleReceiver
         val bluetoothManager = context
             .getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
         bluetoothAdapter = bluetoothManager?.adapter
         permissionChecker = BlePermissionChecker(applicationContext)
+        /* from config */
+        logger = config.logger
+        useBleReceiver = config.bleReceiver !is EmptyBleReceiver
+        bleReceiver = config.bleReceiver
+        scanCallback = BleScanCallback(logger)
     }
 
     fun startBleScan(
@@ -147,7 +78,7 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
         } else {
             startBleScanInternal(filters, settings)
         }
-        return _bleDevice.asStateFlow()
+        return bleDevice.asStateFlow()
     }
 
     private fun startBleScanInternal(
@@ -243,7 +174,7 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
         weakContext?.get()?.let { context ->
             coroutineScope.launch {
                 delay(CONNECT_DELAY)
-                device.connectGatt(context, autoConnect, gattCallback)
+//                device.connectGatt(context, autoConnect, gattCallback)
             }
         }
     }

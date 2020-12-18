@@ -9,8 +9,8 @@ import android.content.Context
 import android.content.Intent
 import com.steleot.blekotlin.internal.UNKNOWN_STATE
 import com.steleot.blekotlin.internal.UNKNOWN_STATUS
-import com.steleot.blekotlin.internal.bluetoothBondStates
-import com.steleot.blekotlin.internal.bluetoothStatuses
+import com.steleot.blekotlin.internal.utils.bluetoothBondStates
+import com.steleot.blekotlin.internal.utils.bluetoothStatuses
 
 /**
  * Logger tag constant.
@@ -19,7 +19,7 @@ private const val TAG = "BluetoothReceiver"
 
 abstract class BleReceiver(
     protected val logger: BleLogger,
-    protected val callbacks: BleReceiverCallbacks
+    protected val callbacks: BleReceiverListener
 ) : BroadcastReceiver() {
 
     override fun onReceive(
@@ -81,7 +81,7 @@ abstract class BleReceiver(
         nextStatus: Int
     )
 
-    interface BleReceiverCallbacks {
+    interface BleReceiverListener {
         fun bluetoothStatus(isEnabled: Boolean)
     }
 }

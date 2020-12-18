@@ -10,7 +10,7 @@ private const val TAG = "EmptyBleReceiver"
 
 internal class EmptyBleReceiver(
     logger: BleLogger,
-    callbacks: BleReceiverCallbacks
+    callbacks: BleReceiverListener
 ) : BleReceiver(logger, callbacks) {
 
     override fun handleBluetoothStateChanged(

@@ -1,4 +1,4 @@
-package com.steleot.blekotlin.internal
+package com.steleot.blekotlin.internal.utils
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice

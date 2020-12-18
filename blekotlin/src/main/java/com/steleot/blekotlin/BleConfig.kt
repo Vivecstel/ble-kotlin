@@ -1,6 +1,6 @@
 package com.steleot.blekotlin
 
-import com.steleot.blekotlin.internal.BleDefaultLogger
+import com.steleot.blekotlin.internal.helper.BleDefaultLogger
 import com.steleot.blekotlin.internal.receiver.DefaultBleReceiver
 
 /**
