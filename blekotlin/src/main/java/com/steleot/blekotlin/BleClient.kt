@@ -15,6 +15,7 @@ import android.content.IntentFilter
 import com.steleot.blekotlin.internal.CONNECT_DELAY
 import com.steleot.blekotlin.internal.callback.BleGattCallback
 import com.steleot.blekotlin.internal.callback.BleScanCallback
+import com.steleot.blekotlin.internal.exception.BleException
 import com.steleot.blekotlin.internal.helper.BlePermissionChecker
 import com.steleot.blekotlin.internal.receiver.EmptyBleReceiver
 import com.steleot.blekotlin.internal.utils.isBleSupported
@@ -41,6 +42,7 @@ object BleClient : BleReceiver.BleReceiverListener,
     private var bluetoothAdapter: BleAdapter? = null
     private lateinit var permissionChecker: BlePermissionChecker
     private lateinit var bleReceiver: BroadcastReceiver
+    private lateinit var bleDeviceStoreHelper: BleDeviceStoreHelper
     private var isScanning = false
     private var lastFilter: List<ScanFilter>? = null
     private var lastSettings: ScanSettings? = null
@@ -57,7 +59,7 @@ object BleClient : BleReceiver.BleReceiverListener,
         config: BleConfig = BleConfig(context)
     ) {
         /* from context */
-        val applicationContext = config.context.applicationContext
+        val applicationContext = context.applicationContext
         weakContext = WeakReference(applicationContext)
         val bluetoothManager = applicationContext
             .getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
@@ -67,6 +69,7 @@ object BleClient : BleReceiver.BleReceiverListener,
         bleLogger = config.bleLogger
         useBleReceiver = config.bleReceiver !is EmptyBleReceiver
         bleReceiver = config.bleReceiver
+        bleDeviceStoreHelper = config.bleDeviceStoreHelper
         scanCallback = BleScanCallback(bleLogger, this)
         gattCallback = BleGattCallback(bleLogger, this)
     }
@@ -75,12 +78,21 @@ object BleClient : BleReceiver.BleReceiverListener,
         filters: List<ScanFilter>? = null,
         settings: ScanSettings = ScanSettings.Builder().build()
     ): StateFlow<BleScanResult?> {
+        validateProperInitialization()
         if (isScanning) {
             bleLogger.log(TAG, "Ble is already scanning")
         } else {
             startBleScanInternal(filters, settings)
         }
         return _bleDevice.asStateFlow()
+    }
+
+    private fun validateProperInitialization() {
+        // at least one late init property needed for the validation
+        if (this::bleLogger.isInitialized) {
+            return
+        }
+        throw BleException("Init was not called. Check documentation better.")
     }
 
     private fun startBleScanInternal(
@@ -135,6 +147,7 @@ object BleClient : BleReceiver.BleReceiverListener,
     }
 
     fun stopBleScan() {
+        validateProperInitialization()
         isScanning = false
         lastFilter = null
         lastSettings = null
@@ -155,6 +168,7 @@ object BleClient : BleReceiver.BleReceiverListener,
         device: BleDevice,
         autoConnect: Boolean = false
     ) {
+        validateProperInitialization()
         bleGatt = null
         stopBleScanInternal()
         weakContext?.get()?.let { context ->
