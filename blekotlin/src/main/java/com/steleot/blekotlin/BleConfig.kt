@@ -1,11 +1,13 @@
 package com.steleot.blekotlin
 
+import com.steleot.blekotlin.internal.BleDefaultLogger
+import com.steleot.blekotlin.internal.receiver.DefaultBleReceiver
+
 /**
  * Ble Configuration class with default values.
  * @param logger: [BleLogger] for logging purposes. You can provide yours.
- * @param useBleReceiver: [Boolean] for registering the ble broadcast receiver for bluetooth.
  */
 class BleConfig(
-    val logger: BleLogger = DefaultBleLogger(),
-    val useBleReceiver: Boolean = true
+    val logger: BleLogger = BleDefaultLogger(),
+    val bleReceiver: BleReceiver = DefaultBleReceiver(logger, BleClient)
 )

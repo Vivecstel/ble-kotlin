@@ -1,7 +1,5 @@
 package com.steleot.blekotlin
 
-import android.util.Log
-
 /**
  * Default interface for logging.
  */
@@ -16,17 +14,4 @@ interface BleLogger {
         tag: String,
         message: String
     )
-}
-
-/**
- * The Default implementation for the [BleLogger].
- */
-internal class DefaultBleLogger : BleLogger {
-
-    override fun log(
-        tag: String,
-        message: String
-    ) {
-        Log.d(tag, message)
-    }
 }

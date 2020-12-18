@@ -1,4 +1,4 @@
-package com.steleot.blekotlin
+package com.steleot.blekotlin.internal
 
 import android.content.Context
 import android.content.pm.PackageManager.FEATURE_BLUETOOTH_LE

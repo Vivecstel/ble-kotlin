@@ -15,6 +15,14 @@ import android.bluetooth.le.ScanSettings
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
+import com.steleot.blekotlin.internal.BlePermissionChecker
+import com.steleot.blekotlin.internal.CONNECT_DELAY
+import com.steleot.blekotlin.internal.UNKNOWN_ERROR
+import com.steleot.blekotlin.internal.UNKNOWN_STATUS
+import com.steleot.blekotlin.internal.gattStatuses
+import com.steleot.blekotlin.internal.isBleSupported
+import com.steleot.blekotlin.internal.receiver.EmptyBleReceiver
+import com.steleot.blekotlin.internal.scanCallbackStatuses
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -122,7 +130,8 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
         val applicationContext = context.applicationContext
         weakContext = WeakReference(applicationContext)
         logger = config.logger
-        useBleReceiver = config.useBleReceiver
+        useBleReceiver = config.bleReceiver !is EmptyBleReceiver
+        bleReceiver = config.bleReceiver
         val bluetoothManager = context
             .getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
         bluetoothAdapter = bluetoothManager?.adapter
@@ -184,7 +193,6 @@ object BleClient : BleReceiver.BleReceiverCallbacks {
     }
 
     private fun registerReceiver() {
-        bleReceiver = BleReceiver(logger, this)
         weakContext?.get()?.registerReceiver(
             bleReceiver, IntentFilter().apply {
                 addAction(ACTION_STATE_CHANGED)

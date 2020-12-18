@@ -1,4 +1,4 @@
-package com.steleot.blekotlin
+package com.steleot.blekotlin.internal
 
 import android.Manifest
 import android.content.Context
