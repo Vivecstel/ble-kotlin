@@ -1,8 +1,8 @@
 package com.steleot.blekotlin.internal.callback
 
-import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothProfile
+import com.steleot.blekotlin.BleGatt
 import com.steleot.blekotlin.BleLogger
 import com.steleot.blekotlin.internal.UNKNOWN_STATUS
 import com.steleot.blekotlin.internal.utils.gattStatuses
@@ -18,20 +18,18 @@ internal class BleGattCallback(
 ) : BluetoothGattCallback() {
 
     override fun onConnectionStateChange(
-        gatt: BluetoothGatt,
+        gatt: BleGatt,
         status: Int,
         newState: Int
     ) {
         val deviceAddress = gatt.device.address
-        if (status == BluetoothGatt.GATT_SUCCESS) {
+        if (status == BleGatt.GATT_SUCCESS) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 logger.log(
                     "BluetoothGattCallback",
                     "Successfully connected to $deviceAddress"
                 )
                 listener.onGattSuccess(gatt)
-//                BleClient.bleGatt = gatt
-//                BleClient.coroutineScope.launch { gatt.discoverServices() }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 logger.log(
                     "BluetoothGattCallback",
@@ -46,16 +44,11 @@ internal class BleGattCallback(
                         " encountered for $deviceAddress. Disconnecting device.."
             )
             listener.onGattFailure()
-//            gatt.close()
-//            if (BleClient.isScanning) BleClient.startBleScanInternal(
-//                BleClient.lastFilter,
-//                BleClient.lastSettings!!
-//            )
         }
     }
 
     override fun onServicesDiscovered(
-        gatt: BluetoothGatt,
+        gatt: BleGatt,
         status: Int
     ) {
         with(gatt) {
@@ -67,7 +60,7 @@ internal class BleGattCallback(
     }
 
     interface BleGattCallbackListener {
-        fun onGattSuccess(gatt: BluetoothGatt)
+        fun onGattSuccess(gatt: BleGatt)
         fun onGattFailure()
     }
 }

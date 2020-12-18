@@ -28,6 +28,8 @@ internal val scanCallbackStatuses by lazy {
         ScanCallback.SCAN_FAILED_APPLICATION_REGISTRATION_FAILED to "Ble scan failed - Application registration failed",
         ScanCallback.SCAN_FAILED_INTERNAL_ERROR to "Ble scan failed - Internal server error",
         ScanCallback.SCAN_FAILED_FEATURE_UNSUPPORTED to "Ble scan failed - Feature unsupported",
+        5 to "Ble scan failed - out of hardware resources",
+        6 to "Ble scan failed - scanning too frequently",
     )
 }
 

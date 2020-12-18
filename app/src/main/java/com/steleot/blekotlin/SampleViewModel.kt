@@ -44,16 +44,15 @@ class SampleViewModel : ViewModel() {
     fun startScanning() {
         viewModelScope.launch {
             BleClient.startBleScan().collect { bleScanResult ->
-                if (bleScanResult != null && bleScanResult.second == 0) {
-                    val scanResult = bleScanResult.first!!
+                if (bleScanResult != null) {
                     val index = _results.value!!.indexOfFirst { result ->
-                        result.device.address == scanResult.device.address
+                        result.device.address == bleScanResult.device.address
                     }
                     val list = _results.value!!.toMutableList()
                     if (index != -1) {
-                        list[index] = scanResult
+                        list[index] = bleScanResult
                     } else {
-                        list.add(scanResult)
+                        list.add(bleScanResult)
                     }
                     _results.value = list
                         /*.sortedBy { it.rssi }*/

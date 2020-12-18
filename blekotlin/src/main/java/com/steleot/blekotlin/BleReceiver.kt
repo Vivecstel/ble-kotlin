@@ -45,8 +45,15 @@ abstract class BleReceiver(
         )
         logger.log(
             TAG,
-            "Previous state is $previousState ${bluetoothStatuses.getOrElse(previousState) { UNKNOWN_STATUS }} " +
-                    "and next state is $nextState ${bluetoothStatuses.getOrElse(nextState) { UNKNOWN_STATUS }}"
+            "Previous state is $previousState ${
+                bluetoothStatuses.getOrElse(previousState) {
+                    UNKNOWN_STATUS
+                }
+            } and next state is $nextState ${
+                bluetoothStatuses.getOrElse(nextState) {
+                    UNKNOWN_STATUS
+                }
+            }"
         )
 
         handleBluetoothStateChanged(previousState, nextState)
@@ -70,8 +77,15 @@ abstract class BleReceiver(
         )
         logger.log(
             TAG,
-            "Previous state is $previousState ${bluetoothBondStates.getOrElse(previousState) { UNKNOWN_STATE }} " +
-                    "and next state is $nextState ${bluetoothBondStates.getOrElse(nextState) { UNKNOWN_STATE }}"
+            "Previous state is $previousState ${
+                bluetoothBondStates.getOrElse(previousState) {
+                    UNKNOWN_STATE
+                }
+            } and next state is $nextState ${
+                bluetoothBondStates.getOrElse(nextState) {
+                    UNKNOWN_STATE
+                }
+            }"
         )
         handleBluetoothBondStateChanged(previousState, nextState)
     }
