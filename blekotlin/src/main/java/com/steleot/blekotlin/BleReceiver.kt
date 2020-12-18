@@ -12,13 +12,10 @@ import com.steleot.blekotlin.internal.UNKNOWN_STATUS
 import com.steleot.blekotlin.internal.utils.bluetoothBondStates
 import com.steleot.blekotlin.internal.utils.bluetoothStatuses
 
-/**
- * Logger tag constant.
- */
 private const val TAG = "BluetoothReceiver"
 
 abstract class BleReceiver(
-    protected val logger: BleLogger,
+    protected val bleLogger: BleLogger,
     protected val callbacks: BleReceiverListener
 ) : BroadcastReceiver() {
 
@@ -43,7 +40,7 @@ abstract class BleReceiver(
             BluetoothAdapter.EXTRA_STATE,
             BluetoothAdapter.ERROR
         )
-        logger.log(
+        bleLogger.log(
             TAG,
             "Previous state is $previousState ${
                 bluetoothStatuses.getOrElse(previousState) {
@@ -75,7 +72,7 @@ abstract class BleReceiver(
             BluetoothDevice.EXTRA_BOND_STATE,
             BluetoothDevice.BOND_NONE
         )
-        logger.log(
+        bleLogger.log(
             TAG,
             "Previous state is $previousState ${
                 bluetoothBondStates.getOrElse(previousState) {

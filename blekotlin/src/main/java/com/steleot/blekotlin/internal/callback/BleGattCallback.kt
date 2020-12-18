@@ -7,13 +7,10 @@ import com.steleot.blekotlin.BleLogger
 import com.steleot.blekotlin.internal.UNKNOWN_STATUS
 import com.steleot.blekotlin.internal.utils.gattStatuses
 
-/**
- * Logger tag constant.
- */
 private const val TAG = "BleGattCallback"
 
 internal class BleGattCallback(
-    private val logger: BleLogger,
+    private val bleLogger: BleLogger,
     private val listener: BleGattCallbackListener
 ) : BluetoothGattCallback() {
 
@@ -25,20 +22,20 @@ internal class BleGattCallback(
         val deviceAddress = gatt.device.address
         if (status == BleGatt.GATT_SUCCESS) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                logger.log(
+                bleLogger.log(
                     "BluetoothGattCallback",
                     "Successfully connected to $deviceAddress"
                 )
                 listener.onGattSuccess(gatt)
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                logger.log(
+                bleLogger.log(
                     "BluetoothGattCallback",
                     "Successfully disconnected from $deviceAddress"
                 )
                 gatt.close()
             }
         } else {
-            logger.log(
+            bleLogger.log(
                 TAG,
                 "Error $status ${gattStatuses.getOrElse(status) { UNKNOWN_STATUS }}" +
                         " encountered for $deviceAddress. Disconnecting device.."
@@ -52,7 +49,7 @@ internal class BleGattCallback(
         status: Int
     ) {
         with(gatt) {
-            logger.log(
+            bleLogger.log(
                 "BluetoothGattCallback",
                 "Discovered ${services.size} services for ${device.address}"
             )

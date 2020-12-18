@@ -1,7 +1,6 @@
 package com.steleot.blekotlin
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothAdapter.ACTION_STATE_CHANGED
 import android.bluetooth.BluetoothDevice.ACTION_BOND_STATE_CHANGED
 import android.bluetooth.BluetoothGatt
@@ -33,14 +32,11 @@ object BleClient : BleReceiver.BleReceiverListener,
     BleScanCallback.BleScanCallbackListener,
     BleGattCallback.BleGattCallbackListener {
 
-    /**
-     * Logger tag constant.
-     */
     private const val TAG = "BleKotlin"
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private var weakContext: WeakReference<Context>? = null
-    private lateinit var logger: BleLogger
+    private lateinit var bleLogger: BleLogger
     private var useBleReceiver = true
     private var bluetoothAdapter: BleAdapter? = null
     private lateinit var permissionChecker: BlePermissionChecker
@@ -58,21 +54,21 @@ object BleClient : BleReceiver.BleReceiverListener,
 
     fun init(
         context: Context,
-        config: BleConfig = BleConfig()
+        config: BleConfig = BleConfig(context)
     ) {
         /* from context */
-        val applicationContext = context.applicationContext
+        val applicationContext = config.context.applicationContext
         weakContext = WeakReference(applicationContext)
-        val bluetoothManager = context
+        val bluetoothManager = applicationContext
             .getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
         bluetoothAdapter = bluetoothManager?.adapter
         permissionChecker = BlePermissionChecker(applicationContext)
         /* from config */
-        logger = config.logger
+        bleLogger = config.bleLogger
         useBleReceiver = config.bleReceiver !is EmptyBleReceiver
         bleReceiver = config.bleReceiver
-        scanCallback = BleScanCallback(logger, this)
-        gattCallback = BleGattCallback(logger, this)
+        scanCallback = BleScanCallback(bleLogger, this)
+        gattCallback = BleGattCallback(bleLogger, this)
     }
 
     fun startBleScan(
@@ -80,7 +76,7 @@ object BleClient : BleReceiver.BleReceiverListener,
         settings: ScanSettings = ScanSettings.Builder().build()
     ): StateFlow<BleScanResult?> {
         if (isScanning) {
-            logger.log(TAG, "Ble is already scanning")
+            bleLogger.log(TAG, "Ble is already scanning")
         } else {
             startBleScanInternal(filters, settings)
         }
@@ -93,31 +89,31 @@ object BleClient : BleReceiver.BleReceiverListener,
     ) {
         when {
             bluetoothAdapter == null -> {
-                logger.log(TAG, "Bluetooth not available on device.")
+                bleLogger.log(TAG, "Bluetooth not available on device.")
                 _status.value = BleStatus.BluetoothNotAvailable
             }
             weakContext?.get()?.isBleSupported() == false -> {
-                logger.log(TAG, "Bluetooth not supported.")
+                bleLogger.log(TAG, "Bluetooth not supported.")
                 _status.value = BleStatus.BleNotSupported
             }
             !permissionChecker.isBluetoothPermissionGranted() -> {
-                logger.log(TAG, "Bluetooth permission is not granted.")
+                bleLogger.log(TAG, "Bluetooth permission is not granted.")
                 _status.value = BleStatus.BluetoothPermissionNotGranted
             }
             !bluetoothAdapter!!.isEnabled -> {
-                logger.log(TAG, "Bluetooth is not enabled on device.")
+                bleLogger.log(TAG, "Bluetooth is not enabled on device.")
                 _status.value = BleStatus.BluetoothNotEnabled
             }
             !permissionChecker.isBluetoothAdminPermissionGranted() -> {
-                logger.log(TAG, "Bluetooth admin permission is not granted.")
+                bleLogger.log(TAG, "Bluetooth admin permission is not granted.")
                 _status.value = BleStatus.BluetoothAdminPermissionNotGranted
             }
             !permissionChecker.isLocationPermissionGranted() -> {
-                logger.log(TAG, "Location permission is not granted.")
+                bleLogger.log(TAG, "Location permission is not granted.")
                 _status.value = BleStatus.LocationPermissionNotGranted
             }
             else -> {
-                logger.log(TAG, "Ble scan started.")
+                bleLogger.log(TAG, "Ble scan started.")
                 if (useBleReceiver) {
                     if (!isScanning) registerReceiver()
                     lastFilter = filters
@@ -147,7 +143,7 @@ object BleClient : BleReceiver.BleReceiverListener,
     }
 
     private fun stopBleScanInternal() {
-        logger.log(TAG, "Stopping Ble scanning")
+        bleLogger.log(TAG, "Stopping Ble scanning")
         bluetoothAdapter!!.bluetoothLeScanner!!.stopScan(scanCallback)
     }
 
@@ -173,13 +169,13 @@ object BleClient : BleReceiver.BleReceiverListener,
         isEnabled: Boolean
     ) {
         if (isEnabled) {
-            logger.log(TAG, "Bluetooth was enabled.")
+            bleLogger.log(TAG, "Bluetooth was enabled.")
             _status.value = BleStatus.BluetoothWasEnabled
             if (isScanning) {
                 startBleScanInternal(lastFilter, lastSettings!!)
             }
         } else {
-            logger.log(TAG, "Bluetooth was closed.")
+            bleLogger.log(TAG, "Bluetooth was closed.")
             _status.value = BleStatus.BluetoothWasClosed
             stopBleScanInternal()
         }

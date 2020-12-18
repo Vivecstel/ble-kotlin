@@ -5,9 +5,9 @@ import com.steleot.blekotlin.BleLogger
 import com.steleot.blekotlin.BleReceiver
 
 internal class DefaultBleReceiver(
-    logger: BleLogger,
+    bleLogger: BleLogger,
     callbacks: BleReceiverListener
-) : BleReceiver(logger, callbacks) {
+) : BleReceiver(bleLogger, callbacks) {
 
     override fun handleBluetoothStateChanged(
         previousState: Int,

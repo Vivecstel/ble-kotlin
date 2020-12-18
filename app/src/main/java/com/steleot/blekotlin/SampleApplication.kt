@@ -13,7 +13,8 @@ class SampleApplication : Application() {
         BleClient.init(
             this,
             BleConfig(
-                object : BleLogger {
+                this,
+                bleLogger = object : BleLogger {
                     override fun log(
                         tag: String,
                         message: String

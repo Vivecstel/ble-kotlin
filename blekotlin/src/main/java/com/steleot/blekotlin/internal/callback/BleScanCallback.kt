@@ -7,13 +7,10 @@ import com.steleot.blekotlin.BleScanResult
 import com.steleot.blekotlin.internal.UNKNOWN_ERROR
 import com.steleot.blekotlin.internal.utils.scanCallbackStatuses
 
-/**
- * Logger tag constant.
- */
 private const val TAG = "BleScanCallback"
 
 internal class BleScanCallback(
-    private val logger: BleLogger,
+    private val bleLogger: BleLogger,
     private val listener: BleScanCallbackListener
 ) : ScanCallback() {
 
@@ -33,7 +30,7 @@ internal class BleScanCallback(
     override fun onScanFailed(
         errorCode: Int
     ) {
-        logger.log(
+        bleLogger.log(
             TAG,
             "Error code $errorCode ${
                 scanCallbackStatuses.getOrElse(errorCode) {

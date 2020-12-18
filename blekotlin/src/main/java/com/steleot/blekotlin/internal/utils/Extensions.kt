@@ -2,6 +2,8 @@ package com.steleot.blekotlin.internal.utils
 
 import android.content.Context
 import android.content.pm.PackageManager.FEATURE_BLUETOOTH_LE
+import com.steleot.blekotlin.internal.UUID_END_INDEX
+import com.steleot.blekotlin.internal.UUID_START_INDEX
 import java.util.Locale
 import java.util.UUID
 
@@ -18,7 +20,7 @@ internal fun UUID.getStandardizedUuidAsString(): String {
     if (stringUUIDRepresentation.startsWith("0000")
         && stringUUIDRepresentation.endsWith("-0000-1000-8000-00805F9B34FB")
     ) {
-        result = stringUUIDRepresentation.substring(4, 8)
+        result = stringUUIDRepresentation.substring(UUID_START_INDEX, UUID_END_INDEX)
     }
     return result
 }
