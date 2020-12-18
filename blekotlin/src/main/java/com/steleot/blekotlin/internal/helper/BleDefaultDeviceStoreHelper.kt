@@ -4,6 +4,11 @@ import android.content.Context
 import com.steleot.blekotlin.BleDeviceStoreHelper
 import com.steleot.blekotlin.BleLogger
 import com.steleot.blekotlin.internal.BLE_SHARED_PREFERENCES
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 
 private const val TAG = "BleDefaultDeviceStoreHelper"
 
@@ -12,35 +17,41 @@ internal class BleDefaultDeviceStoreHelper(
     private val bleLogger: BleLogger
 ) : BleDeviceStoreHelper {
 
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
     private val sharedPreferences = context.getSharedPreferences(
         BLE_SHARED_PREFERENCES, Context.MODE_PRIVATE
     )
 
-    override fun saveBleDevice(
+    override suspend fun saveBleDevice(
         key: String,
         address: String
     ) {
-        bleLogger.log(TAG, "Saving ble device with address $address.")
-        with(sharedPreferences.edit()) {
-            putString(key, address)
-            apply()
+        coroutineScope.launch {
+            bleLogger.log(TAG, "Saving ble device with address $address.")
+            with(sharedPreferences.edit()) {
+                putString(key, address)
+                apply()
+            }
         }
     }
 
-    override fun getBleDevice(
+    override suspend fun getBleDevice(
         key: String
-    ): String? {
+    ): Flow<String?> = flow {
         bleLogger.log(TAG, "Getting ble device from store.")
-        return sharedPreferences.getString(key, null)
+        emit(sharedPreferences.getString(key, null))
     }
 
-    override fun deleteBleDevice(
+    override suspend fun deleteBleDevice(
         key: String
     ) {
-        bleLogger.log(TAG, "Deleting ble device from store.")
-        with(sharedPreferences.edit()) {
-            remove(key)
-            apply()
+        coroutineScope.launch {
+            bleLogger.log(TAG, "Deleting ble device from store.")
+            with(sharedPreferences.edit()) {
+                remove(key)
+                apply()
+            }
         }
     }
 }

@@ -10,3 +10,4 @@ internal const val UUID_START_INDEX = 4
 internal const val UUID_END_INDEX = 8
 
 internal const val BLE_SHARED_PREFERENCES = "ble-shared-preferences"
+internal const val BLE_DEVICE_KEY = "ble-device-key"

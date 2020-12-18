@@ -1,17 +1,19 @@
 package com.steleot.blekotlin
 
+import kotlinx.coroutines.flow.Flow
+
 interface BleDeviceStoreHelper {
 
-    fun saveBleDevice(
+    suspend fun saveBleDevice(
         key: String,
         address: String
     )
 
-    fun getBleDevice(
+    suspend fun getBleDevice(
         key: String
-    ): String?
+    ): Flow<String?>
 
-    fun deleteBleDevice(
+    suspend fun deleteBleDevice(
         key: String
     )
 }
