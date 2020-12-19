@@ -5,6 +5,8 @@ package com.steleot.blekotlin
  */
 interface BleLogger {
 
+    fun isEnabled(): Boolean = true
+
     /**
      * Function that prints a given message for the specific tag.
      * @param tag: The tag given, mostly a constant that represents a class name.

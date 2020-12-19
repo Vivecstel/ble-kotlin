@@ -6,6 +6,7 @@ import com.steleot.blekotlin.BleGatt
 import com.steleot.blekotlin.BleLogger
 import com.steleot.blekotlin.internal.UNKNOWN_STATUS
 import com.steleot.blekotlin.internal.utils.gattStatuses
+import com.steleot.blekotlin.internal.utils.printGattInformation
 
 private const val TAG = "BleGattCallback"
 
@@ -49,10 +50,7 @@ internal class BleGattCallback(
         status: Int
     ) {
         with(gatt) {
-            bleLogger.log(
-                "BluetoothGattCallback",
-                "Discovered ${services.size} services for ${device.address}"
-            )
+            this.printGattInformation(bleLogger, TAG)
         }
     }
 

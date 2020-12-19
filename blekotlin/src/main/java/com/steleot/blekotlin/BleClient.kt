@@ -165,8 +165,7 @@ object BleClient : BleReceiver.BleReceiverListener,
     }
 
     fun connectTo(
-        device: BleDevice,
-        autoConnect: Boolean = false
+        device: BleDevice
     ) {
         validateProperInitialization()
         bleGatt = null
@@ -174,7 +173,7 @@ object BleClient : BleReceiver.BleReceiverListener,
         weakContext?.get()?.let { context ->
             coroutineScope.launch {
                 delay(CONNECT_DELAY)
-                device.connectGatt(context, autoConnect, gattCallback)
+                device.connectGatt(context, false, gattCallback)
             }
         }
     }
