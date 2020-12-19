@@ -135,7 +135,7 @@ private fun BleGattCharacteristic.printProperties(): String = mutableListOf<Stri
 private fun BleGattCharacteristic.isBroadcastable(): Boolean =
     containsProperty(BleGattCharacteristic.PROPERTY_BROADCAST)
 
-private fun BleGattCharacteristic.isReadable(): Boolean =
+internal fun BleGattCharacteristic.isReadable(): Boolean =
     containsProperty(BleGattCharacteristic.PROPERTY_READ)
 
 private fun BleGattCharacteristic.isWritableWithoutResponse(): Boolean =
@@ -159,10 +159,10 @@ private fun BleGattDescriptor.printProperties(): String = mutableListOf<String>(
     if (isEmpty()) add("empty")
 }.joinToString()
 
-private fun BleGattDescriptor.isReadable(): Boolean =
+internal fun BleGattDescriptor.isReadable(): Boolean =
     containsPermission(BleGattDescriptor.PERMISSION_READ)
 
-private fun BleGattDescriptor.isWritable(): Boolean =
+internal fun BleGattDescriptor.isWritable(): Boolean =
     containsPermission(BleGattDescriptor.PERMISSION_WRITE)
 
 private fun BleGattDescriptor.containsPermission(permission: Int): Boolean =

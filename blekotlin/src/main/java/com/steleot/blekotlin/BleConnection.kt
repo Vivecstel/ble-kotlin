@@ -24,6 +24,8 @@ import com.steleot.blekotlin.internal.utils.getDescriptorName
 import com.steleot.blekotlin.internal.utils.isClientCharacteristicConfigurationDescriptor
 import com.steleot.blekotlin.internal.utils.isIndicatable
 import com.steleot.blekotlin.internal.utils.isNotifiable
+import com.steleot.blekotlin.internal.utils.isReadable
+import com.steleot.blekotlin.internal.utils.isWritable
 import com.steleot.blekotlin.internal.utils.printGattInformation
 import com.steleot.blekotlin.internal.utils.toBluetoothUuid
 import com.steleot.blekotlin.internal.utils.toHexString
@@ -246,20 +248,41 @@ class BleConnection(
             }
             is CharacteristicRead -> with(operation) {
                 findCharacteristic(gatt, characteristicUuid) { characteristic ->
-                    // todo validations
-                    gatt.readCharacteristic(characteristic)
+                    if (characteristic.isReadable()) gatt.readCharacteristic(characteristic)
+                    else {
+                        bleLogger.log(
+                            TAG, characteristic.uuid.getCharacteristicName() +
+                                    " isn't readable."
+                        )
+                        signalEndOfOperation()
+                    }
                 }
             }
             is DescriptorWrite -> with(operation) {
                 findDescriptor(gatt, descriptorUuid) { descriptor ->
-                    // todo validations
-                    gatt.writeDescriptor(descriptor)
+                    if (descriptor.isWritable()
+                        || descriptor.isClientCharacteristicConfigurationDescriptor()
+                    ) {
+                        gatt.writeDescriptor(descriptor)
+                    } else {
+                        bleLogger.log(
+                            TAG, descriptor.uuid.getCharacteristicName() +
+                                    " isn't writable."
+                        )
+                    }
                 }
             }
             is DescriptorRead -> with(operation) {
                 findDescriptor(gatt, descriptorUuid) { descriptor ->
-                    // todo validations
-                    gatt.readDescriptor(descriptor)
+                    if (descriptor.isReadable()) {
+                        gatt.readDescriptor(descriptor)
+                    } else {
+                        bleLogger.log(
+                            TAG, descriptor.uuid.getDescriptorName() +
+                                    " isn't readable."
+                        )
+                        signalEndOfOperation()
+                    }
                 }
             }
             is EnableNotifications -> with(operation) {
