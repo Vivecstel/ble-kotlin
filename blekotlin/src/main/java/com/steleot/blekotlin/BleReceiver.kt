@@ -5,8 +5,8 @@ import android.content.Context
 import android.content.Intent
 import com.steleot.blekotlin.internal.UNKNOWN_STATE
 import com.steleot.blekotlin.internal.UNKNOWN_STATUS
-import com.steleot.blekotlin.internal.utils.bluetoothBondStates
-import com.steleot.blekotlin.internal.utils.bluetoothStatuses
+import com.steleot.blekotlin.internal.utils.bleBondStates
+import com.steleot.blekotlin.internal.utils.bleStatuses
 
 private const val TAG = "BluetoothReceiver"
 
@@ -39,20 +39,16 @@ abstract class BleReceiver(
         bleLogger.log(
             TAG,
             "Previous state is $previousState ${
-                bluetoothStatuses.getOrElse(previousState) {
-                    UNKNOWN_STATUS
-                }
+                bleStatuses.getOrElse(previousState) { UNKNOWN_STATUS }
             } and next state is $nextState ${
-                bluetoothStatuses.getOrElse(nextState) {
-                    UNKNOWN_STATUS
-                }
+                bleStatuses.getOrElse(nextState) { UNKNOWN_STATUS }
             }"
         )
 
-        handleBluetoothStateChanged(previousState, nextState)
+        handleBleStateChanged(previousState, nextState)
     }
 
-    abstract fun handleBluetoothStateChanged(
+    abstract fun handleBleStateChanged(
         previousState: Int,
         nextState: Int
     )
@@ -61,35 +57,35 @@ abstract class BleReceiver(
         intent: Intent
     ) {
         val device = intent.getParcelableExtra<BleDevice>(BleDevice.EXTRA_DEVICE)
-        val previousState = intent.getIntExtra(
-            BleDevice.EXTRA_PREVIOUS_BOND_STATE,
-            BleDevice.BOND_NONE
-        )
-        val nextState = intent.getIntExtra(
-            BleDevice.EXTRA_BOND_STATE,
-            BleDevice.BOND_NONE
-        )
-        bleLogger.log(
-            TAG,
-            "Previous state is $previousState ${
-                bluetoothBondStates.getOrElse(previousState) {
-                    UNKNOWN_STATE
-                }
-            } and next state is $nextState ${
-                bluetoothBondStates.getOrElse(nextState) {
-                    UNKNOWN_STATE
-                }
-            }"
-        )
-        handleBluetoothBondStateChanged(previousState, nextState)
+        device?.let {
+            val previousState = intent.getIntExtra(
+                BleDevice.EXTRA_PREVIOUS_BOND_STATE,
+                BleDevice.BOND_NONE
+            )
+            val nextState = intent.getIntExtra(
+                BleDevice.EXTRA_BOND_STATE,
+                BleDevice.BOND_NONE
+            )
+            bleLogger.log(
+                TAG,
+                "Device ${device.address} previous bond state is $previousState ${
+                    bleBondStates.getOrElse(previousState) { UNKNOWN_STATE }
+                } and next bond state is $nextState ${
+                    bleBondStates.getOrElse(nextState) { UNKNOWN_STATE }
+                }"
+            )
+            handleBleBondStateChanged(device, previousState, nextState)
+        }
     }
 
-    abstract fun handleBluetoothBondStateChanged(
-        previousStatus: Int,
-        nextStatus: Int
+    abstract fun handleBleBondStateChanged(
+        bleDevice: BleDevice,
+        previousState: Int,
+        nextState: Int
     )
 
     interface BleReceiverListener {
-        fun bluetoothStatus(isEnabled: Boolean)
+        fun bleStatus(isEnabled: Boolean)
+        fun bleBondState(isBonded: Boolean)
     }
 }

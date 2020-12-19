@@ -5,7 +5,7 @@ import com.steleot.blekotlin.BleDevice
 import com.steleot.blekotlin.BleGatt
 import com.steleot.blekotlin.BleScanCallback
 
-internal val bluetoothStatuses by lazy {
+internal val bleStatuses by lazy {
     mapOf(
         BleAdapter.STATE_OFF to "Bluetooth state off",
         BleAdapter.STATE_TURNING_ON to "Bluetooth state turning on",
@@ -14,7 +14,7 @@ internal val bluetoothStatuses by lazy {
     )
 }
 
-internal val bluetoothBondStates by lazy {
+internal val bleBondStates by lazy {
     mapOf(
         BleDevice.BOND_NONE to "Bond none",
         BleDevice.BOND_BONDING to "Bond bonding",

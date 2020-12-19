@@ -1,6 +1,5 @@
 package com.steleot.blekotlin.internal.callback
 
-import android.bluetooth.le.ScanResult
 import com.steleot.blekotlin.BleLogger
 import com.steleot.blekotlin.BleScanCallback
 import com.steleot.blekotlin.BleScanResult
@@ -16,13 +15,13 @@ internal class BleDefaultScanCallback(
 
     override fun onScanResult(
         callbackType: Int,
-        result: ScanResult
+        result: BleScanResult
     ) {
         listener.onScanResult(result)
     }
 
     override fun onBatchScanResults(
-        results: MutableList<ScanResult>?
+        results: MutableList<BleScanResult>?
     ) {
         /* empty implementation */
     }

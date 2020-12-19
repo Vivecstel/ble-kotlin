@@ -1,9 +1,9 @@
 package com.steleot.blekotlin.internal.callback
 
-import android.bluetooth.BluetoothProfile
 import com.steleot.blekotlin.BleGatt
 import com.steleot.blekotlin.BleGattCallback
 import com.steleot.blekotlin.BleLogger
+import com.steleot.blekotlin.BleProfile
 import com.steleot.blekotlin.internal.UNKNOWN_STATUS
 import com.steleot.blekotlin.internal.utils.gattStatuses
 import com.steleot.blekotlin.internal.utils.printGattInformation
@@ -16,30 +16,34 @@ internal class BleDefaultGattCallback(
 ) : BleGattCallback() {
 
     override fun onConnectionStateChange(
-        gatt: BleGatt,
+        bleGatt: BleGatt,
         status: Int,
         newState: Int
     ) {
-        val deviceAddress = gatt.device.address
-        if (status == BleGatt.GATT_SUCCESS) {
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                bleLogger.log(
-                    TAG, "Successfully connected to $deviceAddress"
-                )
-                listener.onGattSuccess(gatt)
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                bleLogger.log(
-                    TAG, "Successfully disconnected from $deviceAddress"
-                )
-                gatt.close()
+        val deviceAddress = bleGatt.device.address
+        when (status) {
+            BleGatt.GATT_SUCCESS -> {
+                if (newState == BleProfile.STATE_CONNECTED) {
+                    bleLogger.log(TAG, "Successfully connected to $deviceAddress")
+                    listener.onGattSuccess(bleGatt)
+                } else if (newState == BleProfile.STATE_DISCONNECTED) {
+                    bleLogger.log(TAG, "Successfully disconnected from $deviceAddress")
+                    bleGatt.close()
+                }
             }
-        } else {
-            bleLogger.log(
-                TAG,
-                "Error $status ${gattStatuses.getOrElse(status) { UNKNOWN_STATUS }}" +
-                        " encountered for $deviceAddress. Disconnecting device.."
-            )
-            listener.onGattFailure()
+            BleGatt.GATT_INSUFFICIENT_ENCRYPTION,
+            BleGatt.GATT_INSUFFICIENT_AUTHENTICATION -> {
+                bleLogger.log(TAG, "Trying to bond with $deviceAddress")
+                listener.onGattNeedsBond(bleGatt)
+            }
+            else -> {
+                bleLogger.log(
+                    TAG,
+                    "Error $status ${gattStatuses.getOrElse(status) { UNKNOWN_STATUS }}" +
+                            " encountered for $deviceAddress. Disconnecting device.."
+                )
+                listener.onGattFailure()
+            }
         }
     }
 
@@ -54,6 +58,7 @@ internal class BleDefaultGattCallback(
 
     interface BleGattCallbackListener {
         fun onGattSuccess(bleGatt: BleGatt)
+        fun onGattNeedsBond(bleGatt: BleGatt)
         fun onGattFailure()
     }
 }

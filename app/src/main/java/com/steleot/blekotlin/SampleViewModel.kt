@@ -1,6 +1,5 @@
 package com.steleot.blekotlin
 
-import android.bluetooth.le.ScanResult
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,7 +11,7 @@ import timber.log.Timber
 class SampleViewModel : ViewModel() {
 
     private val _results = MutableLiveData<List<BleScanResult>>()
-    val results: LiveData<List<ScanResult>> = _results
+    val results: LiveData<List<BleScanResult>> = _results
 
     init {
         viewModelScope.launch {

@@ -3,7 +3,6 @@
 package com.steleot.blekotlin
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
@@ -70,9 +69,9 @@ object BleClient : BleReceiver.BleReceiverListener,
         /* from context */
         val applicationContext = context.applicationContext
         weakContext = WeakReference(applicationContext)
-        val bluetoothManager = applicationContext
-            .getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
-        bleAdapter = bluetoothManager?.adapter
+        val bleManager = applicationContext
+            .getSystemService(Context.BLUETOOTH_SERVICE) as? BleManager
+        bleAdapter = bleManager?.adapter
         permissionChecker = BlePermissionChecker(applicationContext)
         /* from config */
         bleLogger = config.bleLogger
@@ -206,7 +205,7 @@ object BleClient : BleReceiver.BleReceiverListener,
         }
     }
 
-    override fun bluetoothStatus(
+    override fun bleStatus(
         isEnabled: Boolean
     ) {
         if (isEnabled) {
@@ -217,12 +216,23 @@ object BleClient : BleReceiver.BleReceiverListener,
                 connectTo(bleGatt!!.device)
             } else if (isScanning) {
                 bleLogger.log(TAG, "Trying to start ble scan again.")
-                startBleScanInternal(lastFilter, lastSettings ?: BleScanSettingsBuilder().build())
+                startBleScanInternal(lastFilter, lastSettings!!)
             }
         } else {
             bleLogger.log(TAG, "Bluetooth was closed.")
             _status.value = BleStatus.BluetoothWasClosed
             stopBleScanInternal()
+        }
+    }
+
+    override fun bleBondState(
+        isBonded: Boolean
+    ) {
+        if (isBonded) {
+            bleLogger.log(TAG, "Trying to reconnect to ble device after bonding success.")
+            connectTo(bleGatt!!.device)
+        } else {
+            onGattFailure()
         }
     }
 
@@ -259,6 +269,14 @@ object BleClient : BleReceiver.BleReceiverListener,
     ) {
         this.bleGatt = bleGatt
         coroutineScope.launch { bleGatt.discoverServices() }
+    }
+
+    override fun onGattNeedsBond(
+        bleGatt: BleGatt
+    ) {
+        this.bleGatt = bleGatt
+        val createBondResult = bleGatt.device.createBond()
+        if (!createBondResult) onGattFailure()
     }
 
     override fun onGattFailure() {
