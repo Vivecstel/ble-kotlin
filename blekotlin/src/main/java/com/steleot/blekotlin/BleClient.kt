@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.lang.ref.WeakReference
 
 @SuppressLint("MissingPermission")
-object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleScanCallbackListener{
+object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleScanCallbackListener {
 
     private const val TAG = "BleKotlin"
 
@@ -45,7 +45,7 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
     private var lastFilter: List<BleScanFilter>? = null
     private var lastSettings: BleScanSettings? = null
     private lateinit var bleScanCallback: BleScanCallback
-    private lateinit var bleConnection : BleConnection
+    private lateinit var bleConnection: BleConnection
 
     private val _status: MutableStateFlow<BleStatus> = MutableStateFlow(BleStatus.NotStarted)
     val status = _status.asStateFlow()
@@ -182,13 +182,14 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
 
     fun connectTo(
         device: BleDevice
-    ) {
+    ): BleConnection {
         validateProperInitialization()
         bleConnection.teardownConnection()
         stopBleScanInternal()
         weakContext?.get()?.let { context ->
             bleConnection.connect(device, context)
         }
+        return bleConnection
     }
 
     override fun bleStatus(

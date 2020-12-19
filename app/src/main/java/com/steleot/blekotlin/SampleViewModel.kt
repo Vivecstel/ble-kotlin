@@ -51,7 +51,7 @@ class SampleViewModel : ViewModel() {
     fun handleDevice(
         bleDevice: BleDevice
     ) {
-        BleClient.connectTo(bleDevice)
+        BleClient.connectTo(bleDevice).enableNotifications(bleDevice)
     }
 
     override fun onCleared() {

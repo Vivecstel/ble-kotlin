@@ -61,9 +61,10 @@ abstract class BleReceiver(
                 BleDevice.EXTRA_BOND_STATE,
                 BleDevice.BOND_NONE
             )
-            bleLogger.log(TAG, "Device ${device.address} previous bond state is " +
-                    "${previousState.getBleBondState()} and next bond state is " +
-                    nextState.getBleBondState()
+            bleLogger.log(
+                TAG, "Device ${device.address} previous bond state is " +
+                        "${previousState.getBleBondState()} and next bond state is " +
+                        nextState.getBleBondState()
             )
             handleBleBondStateChanged(device, previousState, nextState)
         }
