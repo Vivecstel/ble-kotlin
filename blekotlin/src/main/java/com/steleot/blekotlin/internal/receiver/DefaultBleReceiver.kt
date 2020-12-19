@@ -1,6 +1,6 @@
 package com.steleot.blekotlin.internal.receiver
 
-import android.bluetooth.BluetoothAdapter
+import com.steleot.blekotlin.BleAdapter
 import com.steleot.blekotlin.BleLogger
 import com.steleot.blekotlin.BleReceiver
 
@@ -13,9 +13,9 @@ internal class DefaultBleReceiver(
         previousState: Int,
         nextState: Int
     ) {
-        if (nextState == BluetoothAdapter.STATE_ON) {
+        if (nextState == BleAdapter.STATE_ON) {
             callbacks.bluetoothStatus(true)
-        } else if (nextState == BluetoothAdapter.STATE_OFF) {
+        } else if (nextState == BleAdapter.STATE_OFF) {
             callbacks.bluetoothStatus(false)
         }
     }

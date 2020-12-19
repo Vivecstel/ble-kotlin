@@ -1,33 +1,37 @@
 package com.steleot.blekotlin.internal.utils
 
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothGatt
-import android.bluetooth.le.ScanCallback
+import com.steleot.blekotlin.BleAdapter
+import com.steleot.blekotlin.BleDevice
+import com.steleot.blekotlin.BleGatt
+import com.steleot.blekotlin.BleScanCallback
 
 internal val bluetoothStatuses by lazy {
     mapOf(
-        BluetoothAdapter.STATE_OFF to "Bluetooth state off",
-        BluetoothAdapter.STATE_TURNING_ON to "Bluetooth state turning on",
-        BluetoothAdapter.STATE_ON to "Bluetooth state on",
-        BluetoothAdapter.STATE_TURNING_OFF to "Bluetooth state turning off",
+        BleAdapter.STATE_OFF to "Bluetooth state off",
+        BleAdapter.STATE_TURNING_ON to "Bluetooth state turning on",
+        BleAdapter.STATE_ON to "Bluetooth state on",
+        BleAdapter.STATE_TURNING_OFF to "Bluetooth state turning off",
     )
 }
 
 internal val bluetoothBondStates by lazy {
     mapOf(
-        BluetoothDevice.BOND_NONE to "Bond none",
-        BluetoothDevice.BOND_BONDING to "Bond bonding",
-        BluetoothDevice.BOND_BONDED to "Bond bonded",
+        BleDevice.BOND_NONE to "Bond none",
+        BleDevice.BOND_BONDING to "Bond bonding",
+        BleDevice.BOND_BONDED to "Bond bonded",
     )
 }
 
 internal val scanCallbackStatuses by lazy {
     mapOf(
-        ScanCallback.SCAN_FAILED_ALREADY_STARTED to "Ble scan failed - Already started",
-        ScanCallback.SCAN_FAILED_APPLICATION_REGISTRATION_FAILED to "Ble scan failed - Application registration failed",
-        ScanCallback.SCAN_FAILED_INTERNAL_ERROR to "Ble scan failed - Internal server error",
-        ScanCallback.SCAN_FAILED_FEATURE_UNSUPPORTED to "Ble scan failed - Feature unsupported",
+        BleScanCallback.SCAN_FAILED_ALREADY_STARTED
+                to "Ble scan failed - Already started",
+        BleScanCallback.SCAN_FAILED_APPLICATION_REGISTRATION_FAILED
+                to "Ble scan failed - Application registration failed",
+        BleScanCallback.SCAN_FAILED_INTERNAL_ERROR
+                to "Ble scan failed - Internal server error",
+        BleScanCallback.SCAN_FAILED_FEATURE_UNSUPPORTED
+                to "Ble scan failed - Feature unsupported",
         5 to "Ble scan failed - out of hardware resources",
         6 to "Ble scan failed - scanning too frequently",
     )
@@ -35,22 +39,22 @@ internal val scanCallbackStatuses by lazy {
 
 internal val gattStatuses by lazy {
     mapOf(
-        BluetoothGatt.GATT_SUCCESS to "Gatt success",
+        BleGatt.GATT_SUCCESS to "Gatt success",
         0x01 to "Gatt invalid handle",
-        BluetoothGatt.GATT_READ_NOT_PERMITTED to "Gatt read not permitted",
-        BluetoothGatt.GATT_WRITE_NOT_PERMITTED to "Gatt write not permitted",
+        BleGatt.GATT_READ_NOT_PERMITTED to "Gatt read not permitted",
+        BleGatt.GATT_WRITE_NOT_PERMITTED to "Gatt write not permitted",
         0x04 to "Gatt invalid pdu",
-        BluetoothGatt.GATT_INSUFFICIENT_AUTHENTICATION to "Gatt insufficient authentication",
-        BluetoothGatt.GATT_REQUEST_NOT_SUPPORTED to "Gatt request not supported",
-        BluetoothGatt.GATT_INVALID_OFFSET to "Gatt invalid offset",
+        BleGatt.GATT_INSUFFICIENT_AUTHENTICATION to "Gatt insufficient authentication",
+        BleGatt.GATT_REQUEST_NOT_SUPPORTED to "Gatt request not supported",
+        BleGatt.GATT_INVALID_OFFSET to "Gatt invalid offset",
         0x08 to "Gatt insufficient authorization or connection timeout",
         0x09 to "Gatt prepare q full",
         0x0a to "Gatt not found",
         0x0b to "Gatt not long",
         0x0c to "Gatt insufficient key size",
-        BluetoothGatt.GATT_INVALID_ATTRIBUTE_LENGTH to "Gatt invalid attribute length",
+        BleGatt.GATT_INVALID_ATTRIBUTE_LENGTH to "Gatt invalid attribute length",
         0x0e to "Gatt error unlikely",
-        BluetoothGatt.GATT_INSUFFICIENT_ENCRYPTION to "Gatt insufficient encryption",
+        BleGatt.GATT_INSUFFICIENT_ENCRYPTION to "Gatt insufficient encryption",
         0x10 to "Gatt unsupported grp type",
         0x11 to "Gatt insufficient resource",
         0x13 to "Gatt connection terminate peer user",
@@ -72,12 +76,12 @@ internal val gattStatuses by lazy {
         0x8c to "Gatt service started",
         0x8d to "Gatt encrypted no mitm",
         0x8e to "Gatt not encrypted",
-        BluetoothGatt.GATT_CONNECTION_CONGESTED to "Gatt connection congested",
+        BleGatt.GATT_CONNECTION_CONGESTED to "Gatt connection congested",
         0xfd to "Gatt ccc cfg err",
         0xfe to "Gatt prc in progress",
         0xff to "Gatt out of range",
         0x100 to "Gatt connection cancel",
-        BluetoothGatt.GATT_FAILURE to "Gatt failure"
+        BleGatt.GATT_FAILURE to "Gatt failure"
     )
 }
 

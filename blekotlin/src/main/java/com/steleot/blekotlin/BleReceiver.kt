@@ -1,9 +1,5 @@
 package com.steleot.blekotlin
 
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothAdapter.ACTION_STATE_CHANGED
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothDevice.ACTION_BOND_STATE_CHANGED
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -24,8 +20,8 @@ abstract class BleReceiver(
         intent: Intent
     ) {
         when (intent.action) {
-            ACTION_STATE_CHANGED -> bluetoothStateChanged(intent)
-            ACTION_BOND_STATE_CHANGED -> bluetoothBondStateChanged(intent)
+            BleAdapter.ACTION_STATE_CHANGED -> bluetoothStateChanged(intent)
+            BleDevice.ACTION_BOND_STATE_CHANGED -> bluetoothBondStateChanged(intent)
         }
     }
 
@@ -33,12 +29,12 @@ abstract class BleReceiver(
         intent: Intent
     ) {
         val previousState = intent.getIntExtra(
-            BluetoothAdapter.EXTRA_PREVIOUS_STATE,
-            BluetoothAdapter.ERROR
+            BleAdapter.EXTRA_PREVIOUS_STATE,
+            BleAdapter.ERROR
         )
         val nextState = intent.getIntExtra(
-            BluetoothAdapter.EXTRA_STATE,
-            BluetoothAdapter.ERROR
+            BleAdapter.EXTRA_STATE,
+            BleAdapter.ERROR
         )
         bleLogger.log(
             TAG,
@@ -64,13 +60,14 @@ abstract class BleReceiver(
     private fun bluetoothBondStateChanged(
         intent: Intent
     ) {
+        val device = intent.getParcelableExtra<BleDevice>(BleDevice.EXTRA_DEVICE)
         val previousState = intent.getIntExtra(
-            BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE,
-            BluetoothDevice.BOND_NONE
+            BleDevice.EXTRA_PREVIOUS_BOND_STATE,
+            BleDevice.BOND_NONE
         )
         val nextState = intent.getIntExtra(
-            BluetoothDevice.EXTRA_BOND_STATE,
-            BluetoothDevice.BOND_NONE
+            BleDevice.EXTRA_BOND_STATE,
+            BleDevice.BOND_NONE
         )
         bleLogger.log(
             TAG,

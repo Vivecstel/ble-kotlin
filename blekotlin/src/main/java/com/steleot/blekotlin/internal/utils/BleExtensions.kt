@@ -26,8 +26,10 @@ fun BleGatt.printGattInformation(
     if (!bleLogger.isEnabled()) return
 
     if (services.isEmpty()) {
-        bleLogger.log(tag, "No service and characteristic available. Call " +
-                "discoverServices first.")
+        bleLogger.log(
+            tag, "No service and characteristic available. Call " +
+                    "discoverServices first."
+        )
         return
     }
 
@@ -54,8 +56,10 @@ fun BleGatt.printGattInformation(
         }
         val serviceDescription = gattServicesUuids
             .getOrElse(service.uuid.getStandardizedUuidAsString()) { UNKNOWN_UUID }
-        bleLogger.log(tag, "Service $serviceDescription-${service.uuid}\nCharacteristics:" +
-                "\n$characteristicsTable")
+        bleLogger.log(
+            tag, "Service $serviceDescription-${service.uuid}\nCharacteristics:" +
+                    "\n$characteristicsTable"
+        )
     }
 }
 

@@ -11,7 +11,7 @@ import timber.log.Timber
 
 class SampleViewModel : ViewModel() {
 
-    private val _results = MutableLiveData<List<ScanResult>>()
+    private val _results = MutableLiveData<List<BleScanResult>>()
     val results: LiveData<List<ScanResult>> = _results
 
     init {
@@ -43,23 +43,8 @@ class SampleViewModel : ViewModel() {
 
     fun startScanning() {
         viewModelScope.launch {
-            BleClient.startBleScan().collect { bleScanResult ->
-                if (bleScanResult != null) {
-                    val index = _results.value!!.indexOfFirst { result ->
-                        result.device.address == bleScanResult.device.address
-                    }
-                    val list = _results.value!!.toMutableList()
-                    if (index != -1) {
-                        list[index] = bleScanResult
-                    } else {
-                        list.add(bleScanResult)
-                    }
-                    _results.value = list
-                        /*.sortedBy { it.rssi }*/
-                        .toList()
-                } else {
-                    _results.value = listOf()
-                }
+            BleClient.startBleScanMultiple().collect { bleScanResults ->
+                _results.value = bleScanResults
             }
         }
     }
@@ -68,5 +53,9 @@ class SampleViewModel : ViewModel() {
         bleDevice: BleDevice
     ) {
         BleClient.connectTo(bleDevice)
+    }
+
+    override fun onCleared() {
+        BleClient.stopBleScan()
     }
 }
