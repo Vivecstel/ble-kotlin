@@ -7,30 +7,21 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
 import com.steleot.blekotlin.internal.BleScanMode
-import com.steleot.blekotlin.internal.CONNECT_DELAY
-import com.steleot.blekotlin.internal.callback.BleDefaultGattCallback
 import com.steleot.blekotlin.internal.callback.BleDefaultScanCallback
 import com.steleot.blekotlin.internal.exception.BleException
 import com.steleot.blekotlin.internal.helper.BlePermissionChecker
 import com.steleot.blekotlin.internal.receiver.EmptyBleReceiver
 import com.steleot.blekotlin.internal.utils.isBleSupported
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
 @SuppressLint("MissingPermission")
-object BleClient : BleReceiver.BleReceiverListener,
-    BleDefaultScanCallback.BleScanCallbackListener,
-    BleDefaultGattCallback.BleGattCallbackListener {
+object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleScanCallbackListener{
 
     private const val TAG = "BleKotlin"
 
-    private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private var weakContext: WeakReference<Context>? = null
     private lateinit var bleLogger: BleLogger
     private var useBleReceiver = true
@@ -54,8 +45,7 @@ object BleClient : BleReceiver.BleReceiverListener,
     private var lastFilter: List<BleScanFilter>? = null
     private var lastSettings: BleScanSettings? = null
     private lateinit var bleScanCallback: BleScanCallback
-    private var bleGatt: BleGatt? = null
-    private lateinit var bleGattCallback: BleGattCallback
+    private lateinit var bleConnection : BleConnection
 
     private val _status: MutableStateFlow<BleStatus> = MutableStateFlow(BleStatus.NotStarted)
     val status = _status.asStateFlow()
@@ -79,7 +69,7 @@ object BleClient : BleReceiver.BleReceiverListener,
         bleReceiver = config.bleReceiver
         bleDeviceStoreHelper = config.bleDeviceStoreHelper
         bleScanCallback = BleDefaultScanCallback(bleLogger, this)
-        bleGattCallback = BleDefaultGattCallback(bleLogger, this)
+        bleConnection = BleConnection(bleLogger)
     }
 
     fun startBleScanSingle(
@@ -194,14 +184,10 @@ object BleClient : BleReceiver.BleReceiverListener,
         device: BleDevice
     ) {
         validateProperInitialization()
-        bleGatt = null
+        bleConnection.teardownConnection()
         stopBleScanInternal()
         weakContext?.get()?.let { context ->
-            coroutineScope.launch {
-                delay(CONNECT_DELAY)
-                /* autoconnect will not be supported */
-                device.connectGatt(context, false, bleGattCallback)
-            }
+            bleConnection.connect(device, context)
         }
     }
 
@@ -211,9 +197,9 @@ object BleClient : BleReceiver.BleReceiverListener,
         if (isEnabled) {
             bleLogger.log(TAG, "Bluetooth was enabled.")
             _status.value = BleStatus.BluetoothWasEnabled
-            if (bleGatt != null) {
+            if (bleConnection.shouldReconnect() && weakContext?.get() != null) {
                 bleLogger.log(TAG, "Trying to reconnect to ble device.")
-                connectTo(bleGatt!!.device)
+                bleConnection.reconnect(weakContext!!.get()!!)
             } else if (isScanning) {
                 bleLogger.log(TAG, "Trying to start ble scan again.")
                 startBleScanInternal(lastFilter, lastSettings!!)
@@ -230,9 +216,15 @@ object BleClient : BleReceiver.BleReceiverListener,
     ) {
         if (isBonded) {
             bleLogger.log(TAG, "Trying to reconnect to ble device after bonding success.")
-            connectTo(bleGatt!!.device)
+            bleConnection.reconnect(weakContext!!.get()!!)
         } else {
-            onGattFailure()
+            bleConnection.teardownConnection()
+            if (isScanning) {
+                startBleScanInternal(
+                    lastFilter,
+                    lastSettings!!
+                )
+            }
         }
     }
 
@@ -264,29 +256,14 @@ object BleClient : BleReceiver.BleReceiverListener,
         }
     }
 
-    override fun onGattSuccess(
-        bleGatt: BleGatt
-    ) {
-        this.bleGatt = bleGatt
-        coroutineScope.launch { bleGatt.discoverServices() }
-    }
-
-    override fun onGattNeedsBond(
-        bleGatt: BleGatt
-    ) {
-        this.bleGatt = bleGatt
-        val createBondResult = bleGatt.device.createBond()
-        if (!createBondResult) onGattFailure()
-    }
-
-    override fun onGattFailure() {
-        bleGatt?.close()
-        bleGatt = null
-        if (isScanning) {
-            startBleScanInternal(
-                lastFilter,
-                lastSettings!!
-            )
-        }
-    }
+//    override fun onGattFailure() { // todo
+//        bleGatt?.close()
+//        bleGatt = null
+//        if (isScanning) {
+//            startBleScanInternal(
+//                lastFilter,
+//                lastSettings!!
+//            )
+//        }
+//    }
 }

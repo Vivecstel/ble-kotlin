@@ -3,8 +3,7 @@ package com.steleot.blekotlin.internal.callback
 import com.steleot.blekotlin.BleLogger
 import com.steleot.blekotlin.BleScanCallback
 import com.steleot.blekotlin.BleScanResult
-import com.steleot.blekotlin.internal.UNKNOWN_ERROR
-import com.steleot.blekotlin.internal.utils.scanCallbackStatuses
+import com.steleot.blekotlin.internal.utils.getBleScanCallbackStatus
 
 private const val TAG = "BleScanCallback"
 
@@ -31,9 +30,7 @@ internal class BleDefaultScanCallback(
     ) {
         bleLogger.log(
             TAG,
-            "Error code $errorCode ${
-                scanCallbackStatuses.getOrElse(errorCode) { UNKNOWN_ERROR }
-            }"
+            "Error code ${errorCode.getBleScanCallbackStatus()}"
         )
         listener.onScanResult(null)
     }

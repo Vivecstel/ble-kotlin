@@ -3,10 +3,8 @@ package com.steleot.blekotlin
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.steleot.blekotlin.internal.UNKNOWN_STATE
-import com.steleot.blekotlin.internal.UNKNOWN_STATUS
-import com.steleot.blekotlin.internal.utils.bleBondStates
-import com.steleot.blekotlin.internal.utils.bleStatuses
+import com.steleot.blekotlin.internal.utils.getBleBondState
+import com.steleot.blekotlin.internal.utils.getBleState
 
 private const val TAG = "BluetoothReceiver"
 
@@ -38,11 +36,8 @@ abstract class BleReceiver(
         )
         bleLogger.log(
             TAG,
-            "Previous state is $previousState ${
-                bleStatuses.getOrElse(previousState) { UNKNOWN_STATUS }
-            } and next state is $nextState ${
-                bleStatuses.getOrElse(nextState) { UNKNOWN_STATUS }
-            }"
+            "Previous state is ${previousState.getBleState()} and next state is " +
+                    nextState.getBleState()
         )
 
         handleBleStateChanged(previousState, nextState)
@@ -66,13 +61,9 @@ abstract class BleReceiver(
                 BleDevice.EXTRA_BOND_STATE,
                 BleDevice.BOND_NONE
             )
-            bleLogger.log(
-                TAG,
-                "Device ${device.address} previous bond state is $previousState ${
-                    bleBondStates.getOrElse(previousState) { UNKNOWN_STATE }
-                } and next bond state is $nextState ${
-                    bleBondStates.getOrElse(nextState) { UNKNOWN_STATE }
-                }"
+            bleLogger.log(TAG, "Device ${device.address} previous bond state is " +
+                    "${previousState.getBleBondState()} and next bond state is " +
+                    nextState.getBleBondState()
             )
             handleBleBondStateChanged(device, previousState, nextState)
         }

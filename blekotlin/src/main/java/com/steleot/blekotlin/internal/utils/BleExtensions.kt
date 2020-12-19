@@ -6,9 +6,14 @@ import com.steleot.blekotlin.BleGatt
 import com.steleot.blekotlin.BleGattCharacteristic
 import com.steleot.blekotlin.BleGattDescriptor
 import com.steleot.blekotlin.BleLogger
+import com.steleot.blekotlin.internal.UNKNOWN_ERROR
+import com.steleot.blekotlin.internal.UNKNOWN_STATE
+import com.steleot.blekotlin.internal.UNKNOWN_STATUS
 import com.steleot.blekotlin.internal.UNKNOWN_UUID
+import com.steleot.blekotlin.internal.UUID_16_BIT_LENGTH
 import com.steleot.blekotlin.internal.UUID_END_INDEX
 import com.steleot.blekotlin.internal.UUID_START_INDEX
+import com.steleot.blekotlin.internal.exception.BleException
 import java.util.Locale
 import java.util.UUID
 
@@ -19,7 +24,35 @@ import java.util.UUID
 internal fun Context.isBleSupported() =
     packageManager.hasSystemFeature(FEATURE_BLUETOOTH_LE)
 
-fun BleGatt.printGattInformation(
+internal fun Int.getBleState(): String {
+    val name =  bleStatuses.getOrElse(this) { UNKNOWN_STATUS }
+    return "$name - $this"
+}
+
+internal fun Int.getBleBondState(): String {
+    val name =  bleBondStates.getOrElse(this) { UNKNOWN_STATE }
+    return "$name - $this"
+}
+
+internal fun Int.getBleScanCallbackStatus(): String {
+    val name =  scanCallbackStatuses.getOrElse(this) { UNKNOWN_ERROR }
+    return "$name - $this"
+}
+
+fun BleGatt.findCharacteristic(
+    characteristicUuid: UUID
+): BleGattCharacteristic? {
+    services?.forEach { service ->
+        service.characteristics?.firstOrNull { characteristic ->
+            characteristic.uuid == characteristicUuid
+        }?.let { matchingCharacteristic ->
+            return matchingCharacteristic
+        }
+    }
+    return null
+}
+
+internal fun BleGatt.printGattInformation(
     bleLogger: BleLogger,
     tag: String
 ) {
@@ -38,29 +71,41 @@ fun BleGatt.printGattInformation(
             separator = "\n|--",
             prefix = "|--"
         ) { characteristic ->
-            val charDescription = gattCharacteristicUuids
-                .getOrElse(characteristic.uuid.getStandardizedUuidAsString()) { UNKNOWN_UUID }
-            var description = "$charDescription - ${characteristic.uuid}:" +
+            var description = "${characteristic.uuid.getCharacteristicName()}:" +
                     " ${characteristic.printProperties()}"
             if (characteristic.descriptors.isNotEmpty()) {
                 description += "\n" + characteristic.descriptors.joinToString(
                     separator = "\n|------",
                     prefix = "|------"
                 ) { descriptor ->
-                    val descriptorDescription = gattDescriptorUuids
-                        .getOrElse(descriptor.uuid.getStandardizedUuidAsString()) { UNKNOWN_UUID }
-                    "$descriptorDescription-${descriptor.uuid}: ${descriptor.printProperties()}"
+                    "${descriptor.uuid.getDescriptorName()}: ${descriptor.printProperties()}"
                 }
             }
             description
         }
-        val serviceDescription = gattServicesUuids
-            .getOrElse(service.uuid.getStandardizedUuidAsString()) { UNKNOWN_UUID }
         bleLogger.log(
-            tag, "Service $serviceDescription-${service.uuid}\nCharacteristics:" +
-                    "\n$characteristicsTable"
+            tag, "Service ${service.uuid.getServiceName()}\n" +
+                    "Characteristics:\n$characteristicsTable"
         )
     }
+}
+
+internal fun UUID.getServiceName(): String {
+    val name = gattServicesUuids
+        .getOrElse(this.getStandardizedUuidAsString()) { UNKNOWN_UUID }
+    return "$name - $this"
+}
+
+internal fun UUID.getCharacteristicName(): String {
+    val name = gattCharacteristicUuids
+        .getOrElse(this.getStandardizedUuidAsString()) { UNKNOWN_UUID }
+    return "$name - $this"
+}
+
+internal fun UUID.getDescriptorName(): String {
+    val name = gattDescriptorUuids
+        .getOrElse(this.getStandardizedUuidAsString()) { UNKNOWN_UUID }
+    return "$name - $this"
 }
 
 private fun BleGattCharacteristic.printProperties(): String = mutableListOf<String>().apply {
@@ -85,10 +130,10 @@ private fun BleGattCharacteristic.isWritableWithoutResponse(): Boolean =
 private fun BleGattCharacteristic.isWritable(): Boolean =
     containsProperty(BleGattCharacteristic.PROPERTY_WRITE)
 
-private fun BleGattCharacteristic.isNotifiable(): Boolean =
+internal fun BleGattCharacteristic.isNotifiable(): Boolean =
     containsProperty(BleGattCharacteristic.PROPERTY_NOTIFY)
 
-private fun BleGattCharacteristic.isIndicatable(): Boolean =
+internal fun BleGattCharacteristic.isIndicatable(): Boolean =
     containsProperty(BleGattCharacteristic.PROPERTY_INDICATE)
 
 private fun BleGattCharacteristic.containsProperty(property: Int): Boolean =
@@ -109,7 +154,7 @@ private fun BleGattDescriptor.isWritable(): Boolean =
 private fun BleGattDescriptor.containsPermission(permission: Int): Boolean =
     permissions and permission != 0
 
-internal fun UUID.getStandardizedUuidAsString(): String {
+private fun UUID.getStandardizedUuidAsString(): String {
     var result = ""
     val stringUUIDRepresentation: String = this.toString().toUpperCase(Locale.getDefault())
     if (stringUUIDRepresentation.startsWith("0000")
@@ -118,4 +163,9 @@ internal fun UUID.getStandardizedUuidAsString(): String {
         result = stringUUIDRepresentation.substring(UUID_START_INDEX, UUID_END_INDEX)
     }
     return result
+}
+
+internal fun String.toBluetoothUuid(): UUID {
+    require(this.length == UUID_16_BIT_LENGTH)
+    return UUID.fromString("0000$this-0000-1000-8000-00805F9B34FB")
 }

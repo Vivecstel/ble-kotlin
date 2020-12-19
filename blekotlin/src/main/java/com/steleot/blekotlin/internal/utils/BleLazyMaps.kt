@@ -4,6 +4,7 @@ import com.steleot.blekotlin.BleAdapter
 import com.steleot.blekotlin.BleDevice
 import com.steleot.blekotlin.BleGatt
 import com.steleot.blekotlin.BleScanCallback
+import com.steleot.blekotlin.internal.BleDescriptors.CLIENT_CHARACTERISTIC_CONFIGURATION
 
 internal val bleStatuses by lazy {
     mapOf(
@@ -282,7 +283,7 @@ internal val gattDescriptorUuids by lazy {
     mapOf(
         "2900" to "Characteristic Extended Properties",
         "2901" to "Characteristic User Description",
-        "2902" to "Client Characteristic Configuration",
+        CLIENT_CHARACTERISTIC_CONFIGURATION to "Client Characteristic Configuration",
         "2903" to "Server Characteristic Configuration",
         "2904" to "Characteristic Presentation Format",
         "2905" to "Characteristic Aggregate Format",
