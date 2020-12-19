@@ -4,8 +4,6 @@ package com.steleot.blekotlin
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
-import android.bluetooth.le.ScanFilter
-import android.bluetooth.le.ScanSettings
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
@@ -54,8 +52,8 @@ object BleClient : BleReceiver.BleReceiverListener,
             }
             field = value
         }
-    private var lastFilter: List<ScanFilter>? = null
-    private var lastSettings: ScanSettings? = null
+    private var lastFilter: List<BleScanFilter>? = null
+    private var lastSettings: BleScanSettings? = null
     private lateinit var bleScanCallback: BleScanCallback
     private var bleGatt: BleGatt? = null
     private lateinit var bleGattCallback: BleGattCallback
@@ -86,24 +84,24 @@ object BleClient : BleReceiver.BleReceiverListener,
     }
 
     fun startBleScanSingle(
-        filters: List<ScanFilter>? = null,
-        settings: ScanSettings = ScanSettings.Builder().build()
+        filters: List<BleScanFilter>? = null,
+        settings: BleScanSettings = BleScanSettingsBuilder().build()
     ): StateFlow<BleScanResult?> {
         startBleScanCommon(filters, settings, BleScanMode.SingleMode)
         return _bleDevice.asStateFlow()
     }
 
     fun startBleScanMultiple(
-        filters: List<ScanFilter>? = null,
-        settings: ScanSettings = ScanSettings.Builder().build()
+        filters: List<BleScanFilter>? = null,
+        settings: BleScanSettings = BleScanSettingsBuilder().build()
     ): StateFlow<List<BleScanResult>> {
         startBleScanCommon(filters, settings, BleScanMode.ListMode)
         return _bleDevices.asStateFlow()
     }
 
     private fun startBleScanCommon(
-        filters: List<ScanFilter>?,
-        settings: ScanSettings,
+        filters: List<BleScanFilter>?,
+        settings: BleScanSettings,
         bleScanMode: BleScanMode
     ) {
         validateProperInitialization()
@@ -125,8 +123,8 @@ object BleClient : BleReceiver.BleReceiverListener,
     }
 
     private fun startBleScanInternal(
-        filters: List<ScanFilter>?,
-        settings: ScanSettings
+        filters: List<BleScanFilter>?,
+        settings: BleScanSettings
     ) {
         when {
             bleAdapter == null -> {
@@ -219,7 +217,7 @@ object BleClient : BleReceiver.BleReceiverListener,
                 connectTo(bleGatt!!.device)
             } else if (isScanning) {
                 bleLogger.log(TAG, "Trying to start ble scan again.")
-                startBleScanInternal(lastFilter, lastSettings!!)
+                startBleScanInternal(lastFilter, lastSettings ?: BleScanSettingsBuilder().build())
             }
         } else {
             bleLogger.log(TAG, "Bluetooth was closed.")
