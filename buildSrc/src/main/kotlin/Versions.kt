@@ -8,6 +8,7 @@ object Versions {
     const val androidPlugin = "4.1.1"
     const val benManes = "0.36.0"
     const val detekt = "1.15.0"
+    const val bintray = "1.8.4"
 
     /* libraries */
     const val activity = "1.2.0-beta02"

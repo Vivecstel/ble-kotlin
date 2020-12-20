@@ -1,3 +1,4 @@
+
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import io.gitlab.arturbosch.detekt.Detekt
 
@@ -5,7 +6,12 @@ plugins {
     kotlin(BuildPlugins.kotlinJvm) version Versions.kotlin
     id(BuildPlugins.benManes) version Versions.benManes
     id(BuildPlugins.detekt) version Versions.detekt
+    `maven-publish`
+    id(BuildPlugins.bintray) version Versions.bintray
 }
+
+group = "com.steleot.blekotlin"
+version = "0.1.0"
 
 buildscript {
     repositories {
@@ -14,6 +20,7 @@ buildscript {
     }
     dependencies {
         classpath(GradleLibraries.androidPlugin)
+        classpath("com.github.dcendents:android-maven-gradle-plugin:1.4.1")
     }
 }
 

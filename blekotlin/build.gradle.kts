@@ -43,3 +43,6 @@ dependencies {
     testImplementation(TestLibraries.junit)
     androidTestImplementation(TestLibraries.androidJunit)
 }
+
+apply(from = "install.gradle")
+apply(from = "bintray.gradle")

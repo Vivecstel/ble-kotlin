@@ -1,0 +1,37 @@
+apply plugin: 'com.jfrog.bintray'
+
+task sourcesJar(type: Jar, dependsOn: project.classes) {
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: project.javadoc) {
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar, javadocJar
+}
+
+Properties properties = new Properties()
+properties.load(FileInputStream("local.properties"))
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    pkg {
+        repo = "ble-kotlin"
+        name = "com.steleot.blekotlin"
+        desc = "todo description"
+        websiteUrl = "https://github.com/Vivecstel/ble-kotlin"
+        vcsUrl = "https://github.com/Vivecstel/ble-kotlin"
+        slicenses = ["Apache-2.0"]
+        publish = true
+        publicDownloadNumbers = true
+    }
+    version {
+        name = project.version
+        released = new Date()
+        vcsTag = "v${project.version}"
+    }
+}
