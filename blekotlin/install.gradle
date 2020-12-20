@@ -1,0 +1,39 @@
+apply plugin: "com.github.dcendents.android-maven"
+
+group = "com.steleot.blekotlin"
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging "aar"
+                groupId "com.steleot.blekotlin"
+                artifactId "blekotlin"
+                name "blekotlin"
+                description "todo description"
+                url "https://github.com/Vivecstel/ble-kotlin"
+
+                licenses {
+                    license {
+                        name "The Apache Software License, Version 2.0"
+                        url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+
+                developers {
+                    developer {
+                        id "vivecstel"
+                        name "Stelios Elaiotrivaris"
+                        email "steleot@hotmail.com"
+                    }
+                }
+
+                scm {
+                    connection "https://github.com/Vivecstel/ble-kotlin.git"
+                    developerConnection "https://github.com/Vivecstel/ble-kotlin.git"
+                    url "https://github.com/Vivecstel/ble-kotlin"
+                }
+            }
+        }
+    }
+}
