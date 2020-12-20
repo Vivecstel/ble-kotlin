@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.UUID
 
 class SampleViewModel : ViewModel() {
 
@@ -54,7 +55,9 @@ class SampleViewModel : ViewModel() {
         viewModelScope.launch {
             val bleConnection = BleClient.connectTo(bleDevice)
             bleConnection.status.collect { status ->
-
+                if (status.isConnected) {
+                    bleConnection.enableNotifications(UUID.randomUUID()) // todo
+                }
             }
         }
     }

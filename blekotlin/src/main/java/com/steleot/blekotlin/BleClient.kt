@@ -14,6 +14,7 @@ import com.steleot.blekotlin.internal.exception.BleException
 import com.steleot.blekotlin.internal.helper.BlePermissionChecker
 import com.steleot.blekotlin.internal.receiver.EmptyBleReceiver
 import com.steleot.blekotlin.internal.utils.isBleSupported
+import com.steleot.blekotlin.receiver.BleReceiver
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

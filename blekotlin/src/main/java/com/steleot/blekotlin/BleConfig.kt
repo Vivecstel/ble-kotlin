@@ -6,6 +6,7 @@ import com.steleot.blekotlin.helper.BleLogger
 import com.steleot.blekotlin.internal.helper.BleDefaultDeviceStoreHelper
 import com.steleot.blekotlin.internal.helper.BleDefaultLogger
 import com.steleot.blekotlin.internal.receiver.DefaultBleReceiver
+import com.steleot.blekotlin.receiver.BleReceiver
 
 /**
  * Ble Configuration class with default values.

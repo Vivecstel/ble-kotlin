@@ -5,6 +5,10 @@ package com.steleot.blekotlin.helper
  */
 interface BleLogger {
 
+    /**
+     * Used for to check if logging is enabled. The default value is [true]. Override this for
+     * custom behavior.
+     */
     fun isEnabled(): Boolean = true
 
     /**

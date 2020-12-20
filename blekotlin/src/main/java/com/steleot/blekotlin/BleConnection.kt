@@ -185,7 +185,7 @@ class BleConnection(
         }
     }
 
-    fun servicesOnDevice(): List<BleGattService>? = bleGatt?.services
+    fun getServicesOnDevice(): List<BleGattService>? = bleGatt?.services
 
     @Synchronized
     private fun enqueueOperation(
