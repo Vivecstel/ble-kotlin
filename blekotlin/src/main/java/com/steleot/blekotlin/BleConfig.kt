@@ -1,6 +1,8 @@
 package com.steleot.blekotlin
 
 import android.content.Context
+import com.steleot.blekotlin.helper.BleDeviceStoreHelper
+import com.steleot.blekotlin.helper.BleLogger
 import com.steleot.blekotlin.internal.helper.BleDefaultDeviceStoreHelper
 import com.steleot.blekotlin.internal.helper.BleDefaultLogger
 import com.steleot.blekotlin.internal.receiver.DefaultBleReceiver

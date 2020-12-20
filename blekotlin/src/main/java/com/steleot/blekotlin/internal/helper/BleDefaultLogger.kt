@@ -1,7 +1,7 @@
 package com.steleot.blekotlin.internal.helper
 
 import android.util.Log
-import com.steleot.blekotlin.BleLogger
+import com.steleot.blekotlin.helper.BleLogger
 import com.steleot.blekotlin.BuildConfig
 
 /**

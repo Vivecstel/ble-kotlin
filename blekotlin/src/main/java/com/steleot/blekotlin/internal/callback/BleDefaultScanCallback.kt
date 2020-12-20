@@ -1,6 +1,6 @@
 package com.steleot.blekotlin.internal.callback
 
-import com.steleot.blekotlin.BleLogger
+import com.steleot.blekotlin.helper.BleLogger
 import com.steleot.blekotlin.BleScanCallback
 import com.steleot.blekotlin.BleScanResult
 import com.steleot.blekotlin.internal.utils.getBleScanCallbackStatus

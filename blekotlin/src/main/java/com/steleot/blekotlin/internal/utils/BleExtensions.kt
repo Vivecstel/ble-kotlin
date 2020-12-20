@@ -5,7 +5,7 @@ import android.content.pm.PackageManager.FEATURE_BLUETOOTH_LE
 import com.steleot.blekotlin.BleGatt
 import com.steleot.blekotlin.BleGattCharacteristic
 import com.steleot.blekotlin.BleGattDescriptor
-import com.steleot.blekotlin.BleLogger
+import com.steleot.blekotlin.helper.BleLogger
 import com.steleot.blekotlin.internal.BleDescriptors
 import com.steleot.blekotlin.internal.UNKNOWN_ERROR
 import com.steleot.blekotlin.internal.UNKNOWN_STATE
@@ -132,16 +132,16 @@ private fun BleGattCharacteristic.printProperties(): String = mutableListOf<Stri
     if (isEmpty()) add("empty")
 }.joinToString()
 
-private fun BleGattCharacteristic.isBroadcastable(): Boolean =
+internal fun BleGattCharacteristic.isBroadcastable(): Boolean =
     containsProperty(BleGattCharacteristic.PROPERTY_BROADCAST)
 
 internal fun BleGattCharacteristic.isReadable(): Boolean =
     containsProperty(BleGattCharacteristic.PROPERTY_READ)
 
-private fun BleGattCharacteristic.isWritableWithoutResponse(): Boolean =
+internal fun BleGattCharacteristic.isWritableWithoutResponse(): Boolean =
     containsProperty(BleGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)
 
-private fun BleGattCharacteristic.isWritable(): Boolean =
+internal fun BleGattCharacteristic.isWritable(): Boolean =
     containsProperty(BleGattCharacteristic.PROPERTY_WRITE)
 
 internal fun BleGattCharacteristic.isNotifiable(): Boolean =

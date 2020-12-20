@@ -1,6 +1,7 @@
 package com.steleot.blekotlin
 
 import android.app.Application
+import com.steleot.blekotlin.helper.BleLogger
 import timber.log.Timber
 
 class SampleApplication : Application() {

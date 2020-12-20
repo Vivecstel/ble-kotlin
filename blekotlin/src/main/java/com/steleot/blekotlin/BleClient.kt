@@ -6,6 +6,8 @@ import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
+import com.steleot.blekotlin.helper.BleDeviceStoreHelper
+import com.steleot.blekotlin.helper.BleLogger
 import com.steleot.blekotlin.internal.BleScanMode
 import com.steleot.blekotlin.internal.callback.BleDefaultScanCallback
 import com.steleot.blekotlin.internal.exception.BleException

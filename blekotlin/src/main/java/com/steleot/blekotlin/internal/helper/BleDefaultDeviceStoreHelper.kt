@@ -1,8 +1,8 @@
 package com.steleot.blekotlin.internal.helper
 
 import android.content.Context
-import com.steleot.blekotlin.BleDeviceStoreHelper
-import com.steleot.blekotlin.BleLogger
+import com.steleot.blekotlin.helper.BleDeviceStoreHelper
+import com.steleot.blekotlin.helper.BleLogger
 import com.steleot.blekotlin.internal.BLE_SHARED_PREFERENCES
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

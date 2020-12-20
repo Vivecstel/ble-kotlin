@@ -1,8 +1,11 @@
-package com.steleot.blekotlin
+package com.steleot.blekotlin.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.steleot.blekotlin.BleAdapter
+import com.steleot.blekotlin.BleDevice
+import com.steleot.blekotlin.helper.BleLogger
 import com.steleot.blekotlin.internal.utils.getBleBondState
 import com.steleot.blekotlin.internal.utils.getBleState
 

@@ -51,7 +51,12 @@ class SampleViewModel : ViewModel() {
     fun handleDevice(
         bleDevice: BleDevice
     ) {
-        BleClient.connectTo(bleDevice).enableNotifications(bleDevice)
+        viewModelScope.launch {
+            val bleConnection = BleClient.connectTo(bleDevice)
+            bleConnection.status.collect { status ->
+
+            }
+        }
     }
 
     override fun onCleared() {

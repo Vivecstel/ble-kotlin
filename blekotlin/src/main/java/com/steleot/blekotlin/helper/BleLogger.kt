@@ -1,4 +1,4 @@
-package com.steleot.blekotlin
+package com.steleot.blekotlin.helper
 
 /**
  * Default interface for logging.

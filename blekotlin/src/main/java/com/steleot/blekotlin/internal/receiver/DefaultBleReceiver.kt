@@ -2,8 +2,8 @@ package com.steleot.blekotlin.internal.receiver
 
 import com.steleot.blekotlin.BleAdapter
 import com.steleot.blekotlin.BleDevice
-import com.steleot.blekotlin.BleLogger
-import com.steleot.blekotlin.BleReceiver
+import com.steleot.blekotlin.helper.BleLogger
+import com.steleot.blekotlin.receiver.BleReceiver
 
 internal class DefaultBleReceiver(
     bleLogger: BleLogger,
