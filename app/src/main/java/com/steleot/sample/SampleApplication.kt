@@ -1,6 +1,9 @@
-package com.steleot.blekotlin
+package com.steleot.sample
 
 import android.app.Application
+import com.steleot.blekotlin.BleClient
+import com.steleot.blekotlin.BleConfig
+import com.steleot.blekotlin.BuildConfig
 import com.steleot.blekotlin.helper.BleLogger
 import timber.log.Timber
 

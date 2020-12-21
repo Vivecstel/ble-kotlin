@@ -5,19 +5,23 @@ import com.steleot.blekotlin.BleDevice
 import com.steleot.blekotlin.helper.BleLogger
 import com.steleot.blekotlin.receiver.BleReceiver
 
+/**
+ * The default implementation of [BleReceiver]. The default implementation for the
+ * [com.steleot.blekotlin.BleConfig] receiver if not a custom one is used.
+ */
 internal class DefaultBleReceiver(
     bleLogger: BleLogger,
-    callbacks: BleReceiverListener
-) : BleReceiver(bleLogger, callbacks) {
+    listener: BleReceiverListener
+) : BleReceiver(bleLogger, listener) {
 
     override fun handleBleStateChanged(
         previousState: Int,
         nextState: Int
     ) {
         if (nextState == BleAdapter.STATE_ON) {
-            callbacks.bleStatus(true)
+            listener.bleStatus(true)
         } else if (nextState == BleAdapter.STATE_OFF) {
-            callbacks.bleStatus(false)
+            listener.bleStatus(false)
         }
     }
 
@@ -27,9 +31,9 @@ internal class DefaultBleReceiver(
         nextState: Int
     ) {
         if (nextState == BleDevice.BOND_BONDED) {
-            callbacks.bleBondState(true)
+            listener.bleBondState(true)
         } else if (nextState == BleDevice.BOND_NONE) {
-            callbacks.bleBondState(false)
+            listener.bleBondState(false)
         }
     }
 }

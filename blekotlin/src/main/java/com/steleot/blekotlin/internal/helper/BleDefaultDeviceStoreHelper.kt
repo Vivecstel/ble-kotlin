@@ -12,6 +12,9 @@ import kotlinx.coroutines.launch
 
 private const val TAG = "BleDefaultDeviceStoreHelper"
 
+/**
+ *
+ */
 internal class BleDefaultDeviceStoreHelper(
     context: Context,
     private val bleLogger: BleLogger

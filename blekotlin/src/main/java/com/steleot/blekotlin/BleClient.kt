@@ -1,4 +1,4 @@
-@file:Suppress("ObjectPropertyName")
+@file:Suppress("ObjectPropertyName", "unused")
 
 package com.steleot.blekotlin
 
@@ -12,14 +12,18 @@ import com.steleot.blekotlin.internal.BleScanMode
 import com.steleot.blekotlin.internal.callback.BleDefaultScanCallback
 import com.steleot.blekotlin.internal.exception.BleException
 import com.steleot.blekotlin.internal.helper.BlePermissionChecker
-import com.steleot.blekotlin.internal.receiver.EmptyBleReceiver
 import com.steleot.blekotlin.internal.utils.isBleSupported
 import com.steleot.blekotlin.receiver.BleReceiver
+import com.steleot.blekotlin.receiver.EmptyBleReceiver
+import com.steleot.blekotlin.status.BleStatus
+import java.lang.ref.WeakReference
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.lang.ref.WeakReference
 
+/**
+ * The core class of the library that handles any bluetooth communications, scan, etc.
+ */
 @SuppressLint("MissingPermission")
 object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleScanCallbackListener {
 
@@ -51,10 +55,19 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
     private lateinit var bleConnection: BleConnection
 
     private val _status: MutableStateFlow<BleStatus> = MutableStateFlow(BleStatus.NotStarted)
+
+    /**
+     * the Status of the bluetooth via a [StateFlow].
+     */
     val status = _status.asStateFlow()
     private val _bleDevice: MutableStateFlow<BleScanResult?> = MutableStateFlow(null)
     private val _bleDevices: MutableStateFlow<List<BleScanResult>> = MutableStateFlow(emptyList())
 
+    /**
+     * The initialization function of the [BleClient].
+     * @param context: [Context] preferably of [android.app.Application].
+     * @param config: [BleConfig] optional configuration for custom behavior.
+     */
     fun init(
         context: Context,
         config: BleConfig = BleConfig(context)
@@ -75,6 +88,12 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
         bleConnection = BleConnection(bleLogger)
     }
 
+    /**
+     * Starts the ble scan with one scan result at the time.
+     * @param filters: [List] of [BleScanFilter] for filtering available devices.
+     * @param settings: [BleScanSettings] settings for various scan modes.
+     * @return [StateFlow] of the scan result.
+     */
     fun startBleScanSingle(
         filters: List<BleScanFilter>? = null,
         settings: BleScanSettings = BleScanSettingsBuilder().build()
@@ -83,6 +102,12 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
         return _bleDevice.asStateFlow()
     }
 
+    /**
+     * Starts the ble scan with list of scan results.
+     * @param filters: [List] of [BleScanFilter] for filtering available devices.
+     * @param settings: [BleScanSettings] settings for various scan modes.
+     * @return [StateFlow] of the scan results.
+     */
     fun startBleScanMultiple(
         filters: List<BleScanFilter>? = null,
         settings: BleScanSettings = BleScanSettingsBuilder().build()
@@ -165,6 +190,9 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
         )
     }
 
+    /**
+     * Stops the ble scan if the scan is already scanning.
+     */
     fun stopBleScan() {
         validateProperInitialization()
         isScanning = false
@@ -183,6 +211,11 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
         weakContext?.get()?.unregisterReceiver(bleReceiver)
     }
 
+    /**
+     * Connects to the given [BleDevice] through a [BleConnection].
+     * @param device: [BleDevice] that should start a connection.
+     * @return [BleConnection] that handles any Gatt operations.
+     */
     fun connectTo(
         device: BleDevice
     ): BleConnection {

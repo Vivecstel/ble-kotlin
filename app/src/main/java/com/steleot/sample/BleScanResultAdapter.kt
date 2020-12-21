@@ -1,4 +1,4 @@
-package com.steleot.blekotlin
+package com.steleot.sample
 
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.steleot.blekotlin.databinding.ItemBleScanResultBinding
+import com.steleot.sample.databinding.ItemBleScanResultBinding
 
 class BleScanResultAdapter(
     private val viewModel: SampleViewModel

@@ -1,4 +1,4 @@
-package com.steleot.blekotlin
+package com.steleot.sample
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -7,7 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.steleot.blekotlin.databinding.ActivitySampleBinding
+import com.steleot.sample.databinding.ActivitySampleBinding
 import timber.log.Timber
 
 class SampleActivity : AppCompatActivity() {

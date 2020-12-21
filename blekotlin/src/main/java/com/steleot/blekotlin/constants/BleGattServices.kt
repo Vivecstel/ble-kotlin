@@ -1,0 +1,40 @@
+package com.steleot.blekotlin.constants
+
+/**
+ * The available uuids as Strings for the gatt characteristics. This list will updated constantly.
+ */
+object BleGattServices {
+    const val ALERT_NOTIFICATION_SERVICE = "1811"
+    const val BATTERY_SERVICE = "180F"
+    const val BLOOD_PRESSURE = "1810"
+    const val BODY_COMPOSITION = "181B"
+    const val BOND_MANAGEMENT = "181E"
+    const val CONTINUOUS_GLUCOSE_MONITORING = "181F"
+    const val CURRENT_TIME_SERVICE = "1805"
+    const val CYCLING_POWER = "1818"
+    const val CYCLING_SPEED_AND_CADENCE = "1816"
+    const val DEVICE_INFORMATION = "180A"
+    const val ENVIRONMENTAL_SENSING = "181A"
+    const val GENERIC_ACCESS = "1800"
+    const val GENERIC_ATTRIBUTE = "1801"
+    const val GLUCOSE = "1808"
+    const val HEALTH_THERMOMETER = "1809"
+    const val HEART_RATE = "180D"
+    const val HUMAN_INTERFACE_DEVICE = "1812"
+    const val IMMEDIATE_ALERT = "1802"
+    const val LINK_LOSS = "1803"
+    const val LOCATION_AND_NAVIGATION = "1819"
+    const val INTERNET_PROTOCOL_SUPPORT = "1820"
+    const val NEXT_DST_CHANGE_SERVICE = "1807"
+    const val PHONE_ALERT_STATUS_SERVICE = "180E"
+    const val REFERENCE_TIME_UPDATE_SERVICE = "1806"
+    const val RUNNING_SPEED_AND_CADENCE = "1814"
+    const val SCAN_PARAMETERS = "1813"
+    const val TX_POWER = "1804"
+    const val USER_DATA = "181C"
+    const val WEIGHT_SCALE = "181D"
+    const val AUTOMATION_IO = "1815"
+    const val IMMEDIATE_ALERT_SERVICE_1_1 = "1802"
+    const val LINK_LOSS_SERVICE_1_1 = "1803"
+    const val TX_POWER_SERVICE_1_1 = "1804"
+}

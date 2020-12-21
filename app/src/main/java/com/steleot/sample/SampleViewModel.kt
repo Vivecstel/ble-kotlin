@@ -1,13 +1,17 @@
-package com.steleot.blekotlin
+package com.steleot.sample
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.steleot.blekotlin.BleClient
+import com.steleot.blekotlin.BleDevice
+import com.steleot.blekotlin.BleScanResult
+import com.steleot.blekotlin.status.BleStatus
+import java.util.UUID
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.UUID
 
 class SampleViewModel : ViewModel() {
 

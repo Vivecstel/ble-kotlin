@@ -10,7 +10,10 @@ object BuildPlugins {
     const val detekt = "io.gitlab.arturbosch.detekt"
 
     /* https://github.com/bintray/gradle-bintray-plugin */
-    const val bintray = "com.jfrog.bintray"
+    const val jFrogBintray = "com.jfrog.bintray"
+
+    /* https://github.com/Kotlin/dokka */
+    const val jetbrainsDokka = "org.jetbrains.dokka"
 
     /* https://developer.android.com/studio/build */
     const val androidApplication = "com.android.application"

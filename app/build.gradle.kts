@@ -8,7 +8,7 @@ android {
     buildToolsVersion = "30.0.3"
 
     defaultConfig {
-        applicationId("com.steleot.blekotlin")
+        applicationId("com.steleot.sample")
         minSdkVersion(AndroidConfiguration.minSdk)
         targetSdkVersion(AndroidConfiguration.targetSdk)
         versionCode = 1

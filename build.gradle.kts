@@ -14,8 +14,6 @@ buildscript {
     }
     dependencies {
         classpath(GradleLibraries.androidPlugin)
-        classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4")
-        classpath("com.github.dcendents:android-maven-gradle-plugin:1.4.1")
     }
 }
 
@@ -24,6 +22,10 @@ allprojects {
         google()
         jcenter()
     }
+}
+
+subprojects {
+    tasks.withType<Javadoc>().all { enabled = false }
 }
 
 tasks.named<DependencyUpdatesTask>("dependencyUpdates").configure {

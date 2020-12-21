@@ -1,15 +1,17 @@
-package com.steleot.blekotlin.internal.receiver
+package com.steleot.blekotlin.receiver
 
 import com.steleot.blekotlin.BleDevice
 import com.steleot.blekotlin.helper.BleLogger
-import com.steleot.blekotlin.receiver.BleReceiver
 
 private const val TAG = "EmptyBleReceiver"
 
+/**
+ * An empty implementation of [BleReceiver]. Using this is assumed that [BleReceiver] is not needed.
+ */
 internal class EmptyBleReceiver(
     bleLogger: BleLogger,
-    callbacks: BleReceiverListener
-) : BleReceiver(bleLogger, callbacks) {
+    listener: BleReceiverListener
+) : BleReceiver(bleLogger, listener) {
 
     override fun handleBleStateChanged(
         previousState: Int,

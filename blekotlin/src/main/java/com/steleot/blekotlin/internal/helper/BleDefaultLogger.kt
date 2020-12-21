@@ -1,8 +1,8 @@
 package com.steleot.blekotlin.internal.helper
 
 import android.util.Log
-import com.steleot.blekotlin.helper.BleLogger
 import com.steleot.blekotlin.BuildConfig
+import com.steleot.blekotlin.helper.BleLogger
 
 /**
  * The Default implementation for the [BleLogger].

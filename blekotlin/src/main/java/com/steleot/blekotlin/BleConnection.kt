@@ -4,48 +4,29 @@ package com.steleot.blekotlin
 
 import android.annotation.SuppressLint
 import android.content.Context
+import com.steleot.blekotlin.constants.BleGattDescriptors
 import com.steleot.blekotlin.helper.BleLogger
-import com.steleot.blekotlin.internal.BLE_GATT_MAX_MTU_SIZE
-import com.steleot.blekotlin.internal.BLE_GATT_MIN_MTU_SIZE
-import com.steleot.blekotlin.internal.BleDescriptors
-import com.steleot.blekotlin.internal.BleOperation
-import com.steleot.blekotlin.internal.CONNECT_DELAY
-import com.steleot.blekotlin.internal.CharacteristicRead
-import com.steleot.blekotlin.internal.CharacteristicWrite
-import com.steleot.blekotlin.internal.Connect
-import com.steleot.blekotlin.internal.DescriptorRead
-import com.steleot.blekotlin.internal.DescriptorWrite
-import com.steleot.blekotlin.internal.DisableNotifications
-import com.steleot.blekotlin.internal.Disconnect
-import com.steleot.blekotlin.internal.EnableNotifications
-import com.steleot.blekotlin.internal.MtuRequest
-import com.steleot.blekotlin.internal.utils.findCharacteristic
-import com.steleot.blekotlin.internal.utils.findDescriptor
-import com.steleot.blekotlin.internal.utils.getBleGattStatus
-import com.steleot.blekotlin.internal.utils.getCharacteristicName
-import com.steleot.blekotlin.internal.utils.getDescriptorName
-import com.steleot.blekotlin.internal.utils.isClientCharacteristicConfigurationDescriptor
-import com.steleot.blekotlin.internal.utils.isIndicatable
-import com.steleot.blekotlin.internal.utils.isNotifiable
-import com.steleot.blekotlin.internal.utils.isReadable
-import com.steleot.blekotlin.internal.utils.isWritable
-import com.steleot.blekotlin.internal.utils.isWritableWithoutResponse
-import com.steleot.blekotlin.internal.utils.printGattInformation
-import com.steleot.blekotlin.internal.utils.toBluetoothUuid
-import com.steleot.blekotlin.internal.utils.toHexString
+import com.steleot.blekotlin.internal.*
+import com.steleot.blekotlin.internal.utils.*
+import com.steleot.blekotlin.status.BleConnectionStatus
+import java.util.*
+import java.util.concurrent.ConcurrentLinkedQueue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.UUID
-import java.util.concurrent.ConcurrentLinkedQueue
 
 private const val TAG = "BleConnection"
 
-@SuppressLint("MissingPermission")
-class BleConnection(
+/**
+ * The core class of doing gatt ble actions with a connected device. All actions are added in
+ * queue and are executed in sequence.
+ */
+@SuppressLint("MissingPermission") // private constructor
+class BleConnection internal constructor(
     private val bleLogger: BleLogger
 ) {
 
@@ -54,8 +35,15 @@ class BleConnection(
     private val operationsQueue = ConcurrentLinkedQueue<BleOperation>()
     private var pendingOperation: BleOperation? = null
     private var _status = MutableStateFlow(BleConnectionStatus())
+
+    /**
+     * The Status of the bluetooth connection via a [StateFlow].
+     */
     val status = _status.asStateFlow()
 
+    /**
+     * The connect function that starts a ble gatt connection.
+     */
     internal fun connect(
         device: BleDevice,
         context: Context
@@ -69,8 +57,15 @@ class BleConnection(
         }
     }
 
+    /**
+     * If it should reconnect to the ble device after bluetooth was disabled.
+     */
     internal fun shouldReconnect() = bleGatt != null
 
+    /**
+     * The reconnect function that starts a ble gatt connection after the bluetooth was disabled and
+     * enabled again.
+     */
     internal fun reconnect(
         context: Context
     ) {
@@ -79,6 +74,9 @@ class BleConnection(
         }
     }
 
+    /**
+     * Teardown the current connection.
+     */
     fun teardownConnection() {
         if (bleGatt != null) {
             enqueueOperation(Disconnect(bleGatt!!.device))
@@ -90,6 +88,9 @@ class BleConnection(
         }
     }
 
+    /**
+     * Reads the specific characteristic [UUID] if possible.
+     */
     fun readCharacteristic(
         characteristicUuid: UUID
     ) {
@@ -101,6 +102,9 @@ class BleConnection(
         }
     }
 
+    /**
+     * Writes the specific characteristic [UUID] for the given [payload] if possible.
+     */
     fun writeCharacteristic(
         characteristicUuid: UUID,
         payload: ByteArray
@@ -113,6 +117,9 @@ class BleConnection(
         }
     }
 
+    /**
+     * Reads the specific descriptor [UUID] if possible.
+     */
     fun readDescriptor(
         descriptorUuid: UUID
     ) {
@@ -127,6 +134,9 @@ class BleConnection(
         }
     }
 
+    /**
+     * Writes the specific descriptor [UUID] for the given [payload] if possible.
+     */
     fun writeDescriptor(
         descriptorUuid: UUID,
         payload: ByteArray
@@ -142,6 +152,9 @@ class BleConnection(
         }
     }
 
+    /**
+     * Enables the notifications for the specific characteristic [UUID] if possible.
+     */
     fun enableNotifications(
         characteristicUuid: UUID
     ) {
@@ -163,12 +176,20 @@ class BleConnection(
         }
     }
 
+    /**
+     * Disables the notifications for the specific characteristic [UUID] if possible.
+     */
     fun disableNotifications(
         characteristicUuid: UUID
     ) {
         handleNotifications(characteristicUuid, false)
     }
 
+    /**
+     * Requests specific mtu for write operations. The default value is the [BLE_GATT_MAX_MTU_SIZE].
+     * All values should be between min [BLE_GATT_MIN_MTU_SIZE] or max [BLE_GATT_MAX_MTU_SIZE] else
+     * the [Int] give will coerce between them.
+     */
     fun requestMtu(
         mtu: Int
     ) {
@@ -185,7 +206,18 @@ class BleConnection(
         }
     }
 
+    /**
+     * Gets a list of the available [BleGattService] for the gatt connection.
+     */
     fun getServicesOnDevice(): List<BleGattService>? = bleGatt?.services
+
+    /**
+     * Clears the queue of all operations and removes last pending one.
+     */
+    internal fun removeAllOperations() {
+        operationsQueue.clear()
+        pendingOperation = null
+    }
 
     @Synchronized
     private fun enqueueOperation(
@@ -387,15 +419,17 @@ class BleConnection(
     ) {
         with(operation) {
             findCharacteristic(bleGatt, characteristicUuid) { characteristic ->
-                val uuid = BleDescriptors.CLIENT_CHARACTERISTIC_CONFIGURATION.toBluetoothUuid()
+                val uuid = BleGattDescriptors.CLIENT_CHARACTERISTIC_CONFIGURATION.toBluetoothUuid()
                 val payload = when {
                     characteristic.isIndicatable() ->
                         BleGattDescriptor.ENABLE_INDICATION_VALUE
                     characteristic.isNotifiable() ->
                         BleGattDescriptor.ENABLE_NOTIFICATION_VALUE
                     else -> {
-                        bleLogger.log(TAG, characteristic.uuid.getCharacteristicName() +
-                                "doesn't support notifications / indications")
+                        bleLogger.log(
+                            TAG, characteristic.uuid.getCharacteristicName() +
+                                    "doesn't support notifications / indications"
+                        )
                         signalEndOfOperation()
                         return@findCharacteristic
                     }
@@ -431,12 +465,14 @@ class BleConnection(
         with(operation) {
             findCharacteristic(bleGatt, characteristicUuid) { characteristic ->
                 if (!characteristic.isIndicatable() && !characteristic.isNotifiable()) {
-                    bleLogger.log(TAG, characteristic.uuid.getCharacteristicName() +
-                            "doesn't support notifications / indications")
+                    bleLogger.log(
+                        TAG, characteristic.uuid.getCharacteristicName() +
+                                "doesn't support notifications / indications"
+                    )
                     signalEndOfOperation()
                     return@findCharacteristic
                 }
-                val uuid = BleDescriptors.CLIENT_CHARACTERISTIC_CONFIGURATION.toBluetoothUuid()
+                val uuid = BleGattDescriptors.CLIENT_CHARACTERISTIC_CONFIGURATION.toBluetoothUuid()
                 characteristic.getDescriptor(uuid)?.let { cccDescriptor ->
                     if (!bleGatt.setCharacteristicNotification(characteristic, false)) {
                         bleLogger.log(
@@ -617,8 +653,10 @@ class BleConnection(
             characteristic: BleGattCharacteristic
         ) {
             with(characteristic) {
-                bleLogger.log(TAG, "Characteristic ${uuid.getCharacteristicName()} " +
-                        "changed | value: ${value.toHexString()}")
+                bleLogger.log(
+                    TAG, "Characteristic ${uuid.getCharacteristicName()} " +
+                            "changed | value: ${value.toHexString()}"
+                )
                 _status.value = _status.value.copy(bleGattCharacteristic = this)
             }
         }
