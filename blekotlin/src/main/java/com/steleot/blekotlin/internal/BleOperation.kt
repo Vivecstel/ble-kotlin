@@ -45,7 +45,7 @@ internal data class CharacteristicRead(
     val characteristicUuid: UUID
 ) : BleOperation()
 
-internal data class DescriptorWrite( // todo
+internal data class DescriptorWrite(
     override val bleDevice: BleDevice,
     val descriptorUuid: UUID,
     val payload: ByteArray

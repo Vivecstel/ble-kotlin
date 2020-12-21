@@ -1,4 +1,4 @@
-package com.steleot.sample
+package com.steleot.sample.ui.main
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 
-class SampleViewModel : ViewModel() {
+class MainViewModel : ViewModel() {
 
     private val _results = MutableLiveData<List<BleScanResult>>()
     val results: LiveData<List<BleScanResult>> = _results
@@ -53,20 +53,11 @@ class SampleViewModel : ViewModel() {
         }
     }
 
-    fun handleDevice(
-        bleDevice: BleDevice
-    ) {
-        viewModelScope.launch {
-            val bleConnection = BleClient.connectTo(bleDevice)
-            bleConnection.status.collect { status ->
-                if (status.isConnected) {
-                    bleConnection.enableNotifications(UUID.randomUUID()) // todo
-                }
-            }
-        }
+    fun stopScanning() {
+        BleClient.stopBleScan()
     }
 
     override fun onCleared() {
-        BleClient.stopBleScan()
+        stopScanning()
     }
 }

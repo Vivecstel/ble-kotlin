@@ -20,6 +20,7 @@ object Versions {
     const val material = "1.2.1"
     const val recyclerView = "1.1.0"
     const val timber = "4.7.1"
+    const val bundler = "1.0.3"
 
     /* test libraries */
     const val junit = "4.13.1"

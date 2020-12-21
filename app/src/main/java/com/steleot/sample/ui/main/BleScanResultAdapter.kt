@@ -1,4 +1,4 @@
-package com.steleot.sample
+package com.steleot.sample.ui.main
 
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
@@ -8,10 +8,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.steleot.blekotlin.BleDevice
 import com.steleot.sample.databinding.ItemBleScanResultBinding
 
 class BleScanResultAdapter(
-    private val viewModel: SampleViewModel
+    private val callbacks: Callbacks
 ) : ListAdapter<ScanResult, BleScanResultAdapter.ItemViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(
@@ -20,7 +21,8 @@ class BleScanResultAdapter(
     ): ItemViewHolder {
         return ItemViewHolder(
             ItemBleScanResultBinding
-                .inflate(LayoutInflater.from(parent.context), parent, false)
+                .inflate(LayoutInflater.from(parent.context), parent, false),
+            callbacks
         )
     }
 
@@ -42,16 +44,13 @@ class BleScanResultAdapter(
         holder: ItemViewHolder,
         position: Int
     ) {
-        val scanResult = getItem(position)
-        holder.bind(scanResult)
-        holder.itemView.setOnClickListener {
-            viewModel.handleDevice(scanResult.device)
-        }
+        holder.bind(getItem(position))
     }
 
     @SuppressLint("SetTextI18n")
     class ItemViewHolder(
-        private val binding: ItemBleScanResultBinding
+        private val binding: ItemBleScanResultBinding,
+        private val callbacks: Callbacks
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(
@@ -63,6 +62,9 @@ class BleScanResultAdapter(
                 "Ble Device: ${if (device.name != null) device.name else "not available"}"
             binding.bleAddress.text = "Ble Address: ${device.address}"
             updateRssi(rssi)
+            itemView.setOnClickListener {
+                callbacks.handleDevice(scanResult.device)
+            }
         }
 
         fun updateRssi(
@@ -71,9 +73,16 @@ class BleScanResultAdapter(
             binding.bleRssi.text = "Ble rssi: ${rssi}"
         }
     }
+
+    interface Callbacks {
+
+        fun handleDevice(
+            bleDevice: BleDevice
+        )
+    }
 }
 
-object DiffCallback : DiffUtil.ItemCallback<ScanResult>() {
+private object DiffCallback : DiffUtil.ItemCallback<ScanResult>() {
 
     override fun areItemsTheSame(
         oldItem: ScanResult,

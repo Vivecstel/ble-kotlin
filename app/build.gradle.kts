@@ -51,6 +51,7 @@ dependencies {
     implementation(Libraries.material)
     implementation(Libraries.recyclerView)
     implementation(Libraries.timber)
+    implementation(Libraries.bundler)
 
     testImplementation(TestLibraries.junit)
     androidTestImplementation(TestLibraries.androidJunit)
