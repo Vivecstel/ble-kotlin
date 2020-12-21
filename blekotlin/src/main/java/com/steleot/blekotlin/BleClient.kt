@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.IntentFilter
 import com.steleot.blekotlin.helper.BleDeviceStoreHelper
 import com.steleot.blekotlin.helper.BleLogger
+import com.steleot.blekotlin.internal.BLE_DEVICE_KEY
 import com.steleot.blekotlin.internal.BleScanMode
 import com.steleot.blekotlin.internal.callback.BleDefaultScanCallback
 import com.steleot.blekotlin.internal.exception.BleException
@@ -16,10 +17,10 @@ import com.steleot.blekotlin.internal.utils.isBleSupported
 import com.steleot.blekotlin.receiver.BleReceiver
 import com.steleot.blekotlin.receiver.EmptyBleReceiver
 import com.steleot.blekotlin.status.BleStatus
-import java.lang.ref.WeakReference
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.lang.ref.WeakReference
 
 /**
  * The core class of the library that handles any bluetooth communications, scan, etc.
@@ -213,19 +214,41 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
 
     /**
      * Connects to the given [BleDevice] through a [BleConnection].
-     * @param device: [BleDevice] that should start a connection.
+     * @param bleDevice: [BleDevice] that should start a connection.
      * @return [BleConnection] that handles any Gatt operations.
      */
     fun connectTo(
-        device: BleDevice
+        bleDevice: BleDevice
     ): BleConnection {
         validateProperInitialization()
         bleConnection.teardownConnection()
         stopBleScanInternal()
         weakContext?.get()?.let { context ->
-            bleConnection.connect(device, context)
+            bleConnection.connect(bleDevice, context)
         }
         return bleConnection
+    }
+
+    /**
+     * Save the given device to local storage if easy retrieval next time.
+     * @param bleDevice: the given [BleDevice].
+     */
+    suspend fun saveDevice(
+        bleDevice: BleDevice
+    ) {
+        bleDeviceStoreHelper.saveBleDevice(BLE_DEVICE_KEY, bleDevice.address)
+    }
+
+    /**
+     * Gets the local stored device if any.
+     */
+    suspend fun getStoredDevice() = bleDeviceStoreHelper.getBleDevice(BLE_DEVICE_KEY)
+
+    /**
+     * Delete any stored device from local storage.
+     */
+    suspend fun deleteStoredDevice() {
+        bleDeviceStoreHelper.getBleDevice(BLE_DEVICE_KEY)
     }
 
     override fun bleStatus(
@@ -292,15 +315,4 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
             _bleDevices.value = emptyList()
         }
     }
-
-//    override fun onGattFailure() { // todo
-//        bleGatt?.close()
-//        bleGatt = null
-//        if (isScanning) {
-//            startBleScanInternal(
-//                lastFilter,
-//                lastSettings!!
-//            )
-//        }
-//    }
 }

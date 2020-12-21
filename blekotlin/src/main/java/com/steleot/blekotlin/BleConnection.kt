@@ -9,8 +9,6 @@ import com.steleot.blekotlin.helper.BleLogger
 import com.steleot.blekotlin.internal.*
 import com.steleot.blekotlin.internal.utils.*
 import com.steleot.blekotlin.status.BleConnectionStatus
-import java.util.*
-import java.util.concurrent.ConcurrentLinkedQueue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -18,6 +16,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.*
+import java.util.concurrent.ConcurrentLinkedQueue
 
 private const val TAG = "BleConnection"
 

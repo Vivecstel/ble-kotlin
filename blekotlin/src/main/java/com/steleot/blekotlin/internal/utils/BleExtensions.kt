@@ -7,15 +7,8 @@ import com.steleot.blekotlin.BleGattCharacteristic
 import com.steleot.blekotlin.BleGattDescriptor
 import com.steleot.blekotlin.constants.BleGattDescriptors
 import com.steleot.blekotlin.helper.BleLogger
-import com.steleot.blekotlin.internal.UNKNOWN_ERROR
-import com.steleot.blekotlin.internal.UNKNOWN_STATE
-import com.steleot.blekotlin.internal.UNKNOWN_STATUS
-import com.steleot.blekotlin.internal.UNKNOWN_UUID
-import com.steleot.blekotlin.internal.UUID_16_BIT_LENGTH
-import com.steleot.blekotlin.internal.UUID_END_INDEX
-import com.steleot.blekotlin.internal.UUID_START_INDEX
-import java.util.Locale
-import java.util.UUID
+import com.steleot.blekotlin.internal.*
+import java.util.*
 
 /**
  * Extension function for the [Context] that check if system feature for [FEATURE_BLUETOOTH_LE] is
