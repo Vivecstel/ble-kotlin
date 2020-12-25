@@ -11,6 +11,12 @@ import com.steleot.blekotlin.internal.utils.*
 import com.steleot.blekotlin.status.BleConnectionStatus
 import com.steleot.blekotlin.utils.getCharacteristicName
 import com.steleot.blekotlin.utils.getDescriptorName
+import com.steleot.blekotlin.utils.isIndicatable
+import com.steleot.blekotlin.utils.isNotifiable
+import com.steleot.blekotlin.utils.isReadable
+import com.steleot.blekotlin.utils.isWritable
+import com.steleot.blekotlin.utils.isWritableWithoutResponse
+import com.steleot.blekotlin.utils.toHexString
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlinx.coroutines.CoroutineScope

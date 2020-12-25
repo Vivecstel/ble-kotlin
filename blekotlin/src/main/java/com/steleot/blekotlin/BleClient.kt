@@ -255,7 +255,7 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
      * Delete any stored device from local storage.
      */
     suspend fun deleteStoredDevice() {
-        bleDeviceStoreHelper.getBleDevice(BLE_DEVICE_KEY)
+        bleDeviceStoreHelper.deleteBleDevice(BLE_DEVICE_KEY)
     }
 
     override fun bleStatus(

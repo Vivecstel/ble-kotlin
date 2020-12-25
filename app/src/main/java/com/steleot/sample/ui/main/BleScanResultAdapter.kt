@@ -1,9 +1,9 @@
 package com.steleot.sample.ui.main
 
 import android.annotation.SuppressLint
-import android.bluetooth.le.ScanResult
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -12,7 +12,7 @@ import com.steleot.sample.databinding.ItemBleScanResultBinding
 
 class BleScanResultAdapter(
     private val viewModel: MainViewModel
-) : ListAdapter<ScanResult, BleScanResultAdapter.ItemViewHolder>(DiffCallback) {
+) : ListAdapter<BleScanResultWithSelected, BleScanResultAdapter.ItemViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -53,16 +53,17 @@ class BleScanResultAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(
-            scanResult: ScanResult
+            item: BleScanResultWithSelected
         ) {
-            val device = scanResult.device
-            val rssi = scanResult.rssi
+            val device = item.first.device
+            val rssi = item.first.rssi
             binding.bleName.text =
                 "Ble Device: ${if (device.name != null) device.name else "not available"}"
             binding.bleAddress.text = "Ble Address: ${device.address}"
+            binding.isSaved.visibility = if (item.second) View.VISIBLE else View.GONE
             updateRssi(rssi)
             itemView.setOnClickListener {
-                viewModel.handleDevice(scanResult.device)
+                viewModel.handleDevice(item)
             }
         }
 
@@ -74,30 +75,30 @@ class BleScanResultAdapter(
     }
 }
 
-private object DiffCallback : DiffUtil.ItemCallback<ScanResult>() {
+private object DiffCallback : DiffUtil.ItemCallback<BleScanResultWithSelected>() {
 
     override fun areItemsTheSame(
-        oldItem: ScanResult,
-        newItem: ScanResult
+        oldItem: BleScanResultWithSelected,
+        newItem: BleScanResultWithSelected
     ): Boolean {
-        val oldDevice = oldItem.device
-        val newDevice = newItem.device
+        val oldDevice = oldItem.first.device
+        val newDevice = newItem.first.device
         return oldDevice.address == newDevice.address
     }
 
     override fun areContentsTheSame(
-        oldItem: ScanResult,
-        newItem: ScanResult
+        oldItem: BleScanResultWithSelected,
+        newItem: BleScanResultWithSelected
     ): Boolean {
-        return oldItem.rssi == newItem.rssi
+        return oldItem.first.rssi == newItem.first.rssi
     }
 
     override fun getChangePayload(
-        oldItem: ScanResult,
-        newItem: ScanResult
+        oldItem: BleScanResultWithSelected,
+        newItem: BleScanResultWithSelected
     ): Any {
         return Bundle().apply {
-            putInt("rssi", newItem.rssi)
+            putInt("rssi", newItem.first.rssi)
         }
     }
 }

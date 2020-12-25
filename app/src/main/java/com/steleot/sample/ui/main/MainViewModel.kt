@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.steleot.blekotlin.BleClient
-import com.steleot.blekotlin.BleDevice
 import com.steleot.blekotlin.BleScanResult
 import com.steleot.blekotlin.status.BleStatus
 import com.steleot.sample.ui.utils.Event
@@ -15,14 +14,14 @@ import timber.log.Timber
 
 class MainViewModel : ViewModel() {
 
-    private val _results = MutableLiveData<List<BleScanResult>>()
-    val results: LiveData<List<BleScanResult>> = _results
+    private val _results = MutableLiveData<List<BleScanResultWithSelected>>()
+    val results: LiveData<List<BleScanResultWithSelected>> = _results
 
     private val _bluetoothEnabled = MutableLiveData<Boolean>()
     val bluetoothEnabled: LiveData<Boolean> = _bluetoothEnabled
 
-    private val _goToDetails = MutableLiveData<Event<BleDevice>>()
-    val goToDetails: LiveData<Event<BleDevice>> = _goToDetails
+    private val _goToDetails = MutableLiveData<Event<BleScanResultWithSelected>>()
+    val goToDetails: LiveData<Event<BleScanResultWithSelected>> = _goToDetails
 
     init {
         viewModelScope.launch {
@@ -59,8 +58,12 @@ class MainViewModel : ViewModel() {
 
     fun startScanning() {
         viewModelScope.launch {
-            BleClient.startBleScanMultiple().collect { bleScanResults ->
-                _results.value = bleScanResults
+            BleClient.getStoredDevice().collect { device ->
+                BleClient.startBleScanMultiple().collect { results ->
+                    _results.value = results.map {
+                        it to (it.device.address == device)
+                    }.toList()
+                }
             }
         }
     }
@@ -70,12 +73,14 @@ class MainViewModel : ViewModel() {
     }
 
     fun handleDevice(
-        bleDevice: BleDevice
+        item: BleScanResultWithSelected
     ) {
-        _goToDetails.value = Event(bleDevice)
+        _goToDetails.value = Event(item)
     }
 
     override fun onCleared() {
         stopScanning()
     }
 }
+
+typealias BleScanResultWithSelected = Pair<BleScanResult, Boolean>

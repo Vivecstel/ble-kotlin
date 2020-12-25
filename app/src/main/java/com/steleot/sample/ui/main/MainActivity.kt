@@ -85,12 +85,12 @@ class MainActivity : AppCompatActivity() {
             bluetoothResultLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
         }
         viewModel.goToDetails.observe(this) { event ->
-            event.getContentIfNotHandledOrReturnNull()?.let {
+            event.getContentIfNotHandledOrReturnNull()?.let { item ->
                 viewModel.stopScanning()
                 detailsResultLauncher.launch(
                     Intent(this, DetailsActivity::class.java).apply {
-                        putExtra(BLE_DEVICE, it)
-                        putExtra(IS_SAVED, false)
+                        putExtra(BLE_DEVICE, item.first.device)
+                        putExtra(IS_SAVED, item.second)
                     })
             }
         }

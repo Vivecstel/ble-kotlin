@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.steleot.sample.ui.details.DetailsActivity"
-    tools:ignore="ContentDescription" >
+    tools:ignore="ContentDescription">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -32,6 +31,7 @@
             android:background="@android:color/transparent"
             android:layout_gravity="end|center_vertical"
             android:tint="?android:colorPrimary"
+            android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             tools:src="@drawable/ic_save" />
 
@@ -42,6 +42,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_ble_gatt_services" />
+        tools:listitem="@layout/item_ble_gatt_service" />
 
 </LinearLayout>

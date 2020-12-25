@@ -16,6 +16,12 @@ import com.steleot.blekotlin.internal.UUID_START_INDEX
 import com.steleot.blekotlin.utils.getCharacteristicName
 import com.steleot.blekotlin.utils.getDescriptorName
 import com.steleot.blekotlin.utils.getServiceName
+import com.steleot.blekotlin.utils.isBroadcastable
+import com.steleot.blekotlin.utils.isIndicatable
+import com.steleot.blekotlin.utils.isNotifiable
+import com.steleot.blekotlin.utils.isReadable
+import com.steleot.blekotlin.utils.isWritable
+import com.steleot.blekotlin.utils.isWritableWithoutResponse
 import java.util.Locale
 import java.util.UUID
 
@@ -143,51 +149,6 @@ private fun BleGattCharacteristic.printProperties(): String = mutableListOf<Stri
     if (isEmpty()) add("empty")
 }.joinToString()
 
-/**
- * Extension function that returns if the given [BleGattCharacteristic] has
- * [android.bluetooth.BluetoothGattCharacteristic.PROPERTY_BROADCAST] property.
- */
-internal fun BleGattCharacteristic.isBroadcastable(): Boolean =
-    containsProperty(BleGattCharacteristic.PROPERTY_BROADCAST)
-
-/**
- * Extension function that returns if the given [BleGattCharacteristic] has
- * [android.bluetooth.BluetoothGattCharacteristic.PROPERTY_READ] property.
- */
-internal fun BleGattCharacteristic.isReadable(): Boolean =
-    containsProperty(BleGattCharacteristic.PROPERTY_READ)
-
-/**
- * Extension function that returns if the given [BleGattCharacteristic] has
- * [android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE] property.
- */
-internal fun BleGattCharacteristic.isWritableWithoutResponse(): Boolean =
-    containsProperty(BleGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)
-
-/**
- * Extension function that returns if the given [BleGattCharacteristic] has
- * [android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE] property.
- */
-internal fun BleGattCharacteristic.isWritable(): Boolean =
-    containsProperty(BleGattCharacteristic.PROPERTY_WRITE)
-
-/**
- * Extension function that returns if the given [BleGattCharacteristic] has
- * [android.bluetooth.BluetoothGattCharacteristic.PROPERTY_NOTIFY] property.
- */
-internal fun BleGattCharacteristic.isNotifiable(): Boolean =
-    containsProperty(BleGattCharacteristic.PROPERTY_NOTIFY)
-
-/**
- * Extension function that returns if the given [BleGattCharacteristic] has
- * [android.bluetooth.BluetoothGattCharacteristic.PROPERTY_INDICATE] property.
- */
-internal fun BleGattCharacteristic.isIndicatable(): Boolean =
-    containsProperty(BleGattCharacteristic.PROPERTY_INDICATE)
-
-private fun BleGattCharacteristic.containsProperty(property: Int): Boolean =
-    properties and property != 0
-
 private fun BleGattDescriptor.printProperties(): String = mutableListOf<String>().apply {
     if (isReadable()) add("readable")
     if (isWritable()) add("writable")
@@ -236,12 +197,6 @@ internal fun String.toBluetoothUuidString(): String {
     require(this.length == UUID_16_BIT_LENGTH)
     return "0000$this-0000-1000-8000-00805F9B34FB"
 }
-
-/**
- * Extension function that returns the given [ByteArray] to hex [String] for logging purposes.
- */
-internal fun ByteArray.toHexString(): String =
-    joinToString(separator = " ", prefix = "0x") { String.format("%02X", it) }
 
 /**
  * Extension function that checks if the given [BleGattDescriptor] is of

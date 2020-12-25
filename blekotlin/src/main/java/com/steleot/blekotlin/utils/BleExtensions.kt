@@ -1,5 +1,6 @@
 package com.steleot.blekotlin.utils
 
+import com.steleot.blekotlin.BleGattCharacteristic
 import com.steleot.blekotlin.internal.UNKNOWN_UUID
 import com.steleot.blekotlin.internal.utils.gattCharacteristicUuids
 import com.steleot.blekotlin.internal.utils.gattDescriptorUuids
@@ -33,3 +34,54 @@ fun UUID.getDescriptorName(): String {
         .getOrElse(this.getStandardizedUuidAsString()) { UNKNOWN_UUID }
     return "$name - $this"
 }
+
+/**
+ * Extension function that returns if the given [BleGattCharacteristic] has
+ * [android.bluetooth.BluetoothGattCharacteristic.PROPERTY_BROADCAST] property.
+ */
+fun BleGattCharacteristic.isBroadcastable(): Boolean =
+    containsProperty(BleGattCharacteristic.PROPERTY_BROADCAST)
+
+/**
+ * Extension function that returns if the given [BleGattCharacteristic] has
+ * [android.bluetooth.BluetoothGattCharacteristic.PROPERTY_READ] property.
+ */
+fun BleGattCharacteristic.isReadable(): Boolean =
+    containsProperty(BleGattCharacteristic.PROPERTY_READ)
+
+/**
+ * Extension function that returns if the given [BleGattCharacteristic] has
+ * [android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE] property.
+ */
+fun BleGattCharacteristic.isWritableWithoutResponse(): Boolean =
+    containsProperty(BleGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)
+
+/**
+ * Extension function that returns if the given [BleGattCharacteristic] has
+ * [android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE] property.
+ */
+fun BleGattCharacteristic.isWritable(): Boolean =
+    containsProperty(BleGattCharacteristic.PROPERTY_WRITE)
+
+/**
+ * Extension function that returns if the given [BleGattCharacteristic] has
+ * [android.bluetooth.BluetoothGattCharacteristic.PROPERTY_NOTIFY] property.
+ */
+fun BleGattCharacteristic.isNotifiable(): Boolean =
+    containsProperty(BleGattCharacteristic.PROPERTY_NOTIFY)
+
+/**
+ * Extension function that returns if the given [BleGattCharacteristic] has
+ * [android.bluetooth.BluetoothGattCharacteristic.PROPERTY_INDICATE] property.
+ */
+fun BleGattCharacteristic.isIndicatable(): Boolean =
+    containsProperty(BleGattCharacteristic.PROPERTY_INDICATE)
+
+private fun BleGattCharacteristic.containsProperty(property: Int): Boolean =
+    properties and property != 0
+
+/**
+ * Extension function that returns the given [ByteArray] to hex [String] for logging purposes.
+ */
+fun ByteArray.toHexString(): String =
+    joinToString(separator = " ", prefix = "0x") { String.format("%02X", it) }

@@ -3,6 +3,7 @@ package com.steleot.sample.ui.details
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -74,6 +75,9 @@ class DetailsActivity : AppCompatActivity() {
                 )
             }
             (binding.recyclerView.adapter as BleGattServicesAdapter).submitList(info.services)
+        }
+        viewModel.text.observe(this) {
+            if (it.isNotEmpty()) Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         }
     }
 
