@@ -2,7 +2,7 @@ package com.steleot.blekotlin.internal
 
 import android.content.Context
 import com.steleot.blekotlin.BleDevice
-import java.util.*
+import java.util.UUID
 
 sealed class BleOperation {
     abstract val bleDevice: BleDevice

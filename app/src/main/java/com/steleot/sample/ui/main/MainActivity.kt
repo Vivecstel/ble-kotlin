@@ -2,6 +2,7 @@ package com.steleot.sample.ui.main
 
 import android.Manifest
 import android.app.Activity
+import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -9,15 +10,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.steleot.blekotlin.BleDevice
 import com.steleot.sample.databinding.ActivityMainBinding
 import com.steleot.sample.ui.BLE_DEVICE
+import com.steleot.sample.ui.IS_SAVED
 import com.steleot.sample.ui.details.DetailsActivity
 import timber.log.Timber
 
-class MainActivity : AppCompatActivity(), BleScanResultAdapter.Callbacks {
+class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
+    private lateinit var binding: ActivityMainBinding
+
+    /* location permission */
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -27,14 +31,24 @@ class MainActivity : AppCompatActivity(), BleScanResultAdapter.Callbacks {
             Timber.d("Permission not granted")
         }
     }
-    private val resultForResult = registerForActivityResult(
+
+    /* details result launcher */
+    private val detailsResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            //todo
+            viewModel.startScanning()
         }
     }
-    private lateinit var binding: ActivityMainBinding
+
+    /* bluetooth result launcher */
+    private val bluetoothResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.startScanning()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +56,7 @@ class MainActivity : AppCompatActivity(), BleScanResultAdapter.Callbacks {
         setContentView(binding.root)
         handlePermissions()
         initRecyclerView()
+        initObservers()
     }
 
     private fun handlePermissions() {
@@ -58,19 +73,26 @@ class MainActivity : AppCompatActivity(), BleScanResultAdapter.Callbacks {
     }
 
     private fun initRecyclerView() {
-        val adapter = BleScanResultAdapter(this)
+        val adapter = BleScanResultAdapter(viewModel)
         binding.recyclerView.adapter = adapter
-        viewModel.results.observe(this, {
-            adapter.submitList(it)
-        })
     }
 
-    override fun handleDevice(
-        bleDevice: BleDevice
-    ) {
-        viewModel.startScanning()
-        resultForResult.launch(Intent(this, DetailsActivity::class.java).apply {
-            putExtra(BLE_DEVICE, bleDevice)
+    private fun initObservers() {
+        viewModel.results.observe(this, {
+            (binding.recyclerView.adapter as BleScanResultAdapter).submitList(it)
         })
+        viewModel.bluetoothEnabled.observe(this) {
+            bluetoothResultLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
+        }
+        viewModel.goToDetails.observe(this) { event ->
+            event.getContentIfNotHandledOrReturnNull()?.let {
+                viewModel.stopScanning()
+                detailsResultLauncher.launch(
+                    Intent(this, DetailsActivity::class.java).apply {
+                        putExtra(BLE_DEVICE, it)
+                        putExtra(IS_SAVED, false)
+                    })
+            }
+        }
     }
 }

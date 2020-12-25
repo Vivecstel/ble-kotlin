@@ -7,8 +7,17 @@ import com.steleot.blekotlin.BleGattCharacteristic
 import com.steleot.blekotlin.BleGattDescriptor
 import com.steleot.blekotlin.constants.BleGattDescriptors
 import com.steleot.blekotlin.helper.BleLogger
-import com.steleot.blekotlin.internal.*
-import java.util.*
+import com.steleot.blekotlin.internal.UNKNOWN_ERROR
+import com.steleot.blekotlin.internal.UNKNOWN_STATE
+import com.steleot.blekotlin.internal.UNKNOWN_STATUS
+import com.steleot.blekotlin.internal.UUID_16_BIT_LENGTH
+import com.steleot.blekotlin.internal.UUID_END_INDEX
+import com.steleot.blekotlin.internal.UUID_START_INDEX
+import com.steleot.blekotlin.utils.getCharacteristicName
+import com.steleot.blekotlin.utils.getDescriptorName
+import com.steleot.blekotlin.utils.getServiceName
+import java.util.Locale
+import java.util.UUID
 
 /**
  * Extension function for the [Context] that check if system feature for [FEATURE_BLUETOOTH_LE] is
@@ -124,33 +133,6 @@ internal fun BleGatt.printGattInformation(
     }
 }
 
-/**
- * Extension function that returns the [UUID] service name for logging purposes.
- */
-internal fun UUID.getServiceName(): String {
-    val name = gattServicesUuids
-        .getOrElse(this.getStandardizedUuidAsString()) { UNKNOWN_UUID }
-    return "$name - $this"
-}
-
-/**
- * Extension function that returns the [UUID] characteristic name for logging purposes.
- */
-internal fun UUID.getCharacteristicName(): String {
-    val name = gattCharacteristicUuids
-        .getOrElse(this.getStandardizedUuidAsString()) { UNKNOWN_UUID }
-    return "$name - $this"
-}
-
-/**
- * Extension function that returns the [UUID] descriptor name for logging purposes.
- */
-internal fun UUID.getDescriptorName(): String {
-    val name = gattDescriptorUuids
-        .getOrElse(this.getStandardizedUuidAsString()) { UNKNOWN_UUID }
-    return "$name - $this"
-}
-
 private fun BleGattCharacteristic.printProperties(): String = mutableListOf<String>().apply {
     if (isBroadcastable()) add("broadcastable")
     if (isReadable()) add("readable")
@@ -229,7 +211,7 @@ internal fun BleGattDescriptor.isWritable(): Boolean =
 private fun BleGattDescriptor.containsPermission(permission: Int): Boolean =
     permissions and permission != 0
 
-private fun UUID.getStandardizedUuidAsString(): String {
+internal fun UUID.getStandardizedUuidAsString(): String {
     var result = ""
     val stringUUIDRepresentation: String = this.toString().toUpperCase(Locale.getDefault())
     if (stringUUIDRepresentation.startsWith("0000")

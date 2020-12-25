@@ -8,15 +8,21 @@ import com.steleot.blekotlin.BleClient
 import com.steleot.blekotlin.BleDevice
 import com.steleot.blekotlin.BleScanResult
 import com.steleot.blekotlin.status.BleStatus
+import com.steleot.sample.ui.utils.Event
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.*
 
 class MainViewModel : ViewModel() {
 
     private val _results = MutableLiveData<List<BleScanResult>>()
     val results: LiveData<List<BleScanResult>> = _results
+
+    private val _bluetoothEnabled = MutableLiveData<Boolean>()
+    val bluetoothEnabled: LiveData<Boolean> = _bluetoothEnabled
+
+    private val _goToDetails = MutableLiveData<Event<BleDevice>>()
+    val goToDetails: LiveData<Event<BleDevice>> = _goToDetails
 
     init {
         viewModelScope.launch {
@@ -32,14 +38,20 @@ class MainViewModel : ViewModel() {
                         Timber.d("Bluetooth permission not granted")
                     is BleStatus.BluetoothAdminPermissionNotGranted ->
                         Timber.d("Bluetooth admin permission not granted")
-                    is BleStatus.BluetoothNotEnabled ->
+                    is BleStatus.BluetoothNotEnabled -> {
                         Timber.d("Bluetooth not enabled")
+                        _bluetoothEnabled.value = false
+                    }
                     is BleStatus.LocationPermissionNotGranted ->
                         Timber.d("Location Permission not granted")
-                    is BleStatus.BluetoothWasClosed ->
+                    is BleStatus.BluetoothWasClosed -> {
                         Timber.d("Bluetooth was closed")
-                    is BleStatus.BluetoothWasEnabled ->
+                        _bluetoothEnabled.value = false
+                    }
+                    is BleStatus.BluetoothWasEnabled -> {
                         Timber.d("Bluetooth was enabled")
+                        _bluetoothEnabled.value = true
+                    }
                 }
             }
         }
@@ -55,6 +67,12 @@ class MainViewModel : ViewModel() {
 
     fun stopScanning() {
         BleClient.stopBleScan()
+    }
+
+    fun handleDevice(
+        bleDevice: BleDevice
+    ) {
+        _goToDetails.value = Event(bleDevice)
     }
 
     override fun onCleared() {

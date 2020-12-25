@@ -1,5 +1,5 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-import java.util.*
+import java.util.Date
 
 plugins {
     id(BuildPlugins.androidLibrary)

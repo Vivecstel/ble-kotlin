@@ -17,10 +17,10 @@ import com.steleot.blekotlin.internal.utils.isBleSupported
 import com.steleot.blekotlin.receiver.BleReceiver
 import com.steleot.blekotlin.receiver.EmptyBleReceiver
 import com.steleot.blekotlin.status.BleStatus
+import java.lang.ref.WeakReference
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.lang.ref.WeakReference
 
 /**
  * The core class of the library that handles any bluetooth communications, scan, etc.
@@ -36,6 +36,7 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
     private var bleAdapter: BleAdapter? = null
     private lateinit var permissionChecker: BlePermissionChecker
     private lateinit var bleReceiver: BroadcastReceiver
+    private var isBleReceiverRegistered = false
     private lateinit var bleDeviceStoreHelper: BleDeviceStoreHelper
     private var isScanning = false
         set(value) {
@@ -183,12 +184,15 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
     }
 
     private fun registerReceiver() {
-        weakContext?.get()?.registerReceiver(
-            bleReceiver, IntentFilter().apply {
-                addAction(BleAdapter.ACTION_STATE_CHANGED)
-                addAction(BleDevice.ACTION_BOND_STATE_CHANGED)
-            }
-        )
+        if (!isBleReceiverRegistered) {
+            isBleReceiverRegistered = true
+            weakContext?.get()?.registerReceiver(
+                bleReceiver, IntentFilter().apply {
+                    addAction(BleAdapter.ACTION_STATE_CHANGED)
+                    addAction(BleDevice.ACTION_BOND_STATE_CHANGED)
+                }
+            )
+        }
     }
 
     /**
@@ -209,7 +213,10 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
     }
 
     private fun unregisterReceiver() {
-        weakContext?.get()?.unregisterReceiver(bleReceiver)
+        if (isBleReceiverRegistered) {
+            isBleReceiverRegistered = false
+            weakContext?.get()?.unregisterReceiver(bleReceiver)
+        }
     }
 
     /**

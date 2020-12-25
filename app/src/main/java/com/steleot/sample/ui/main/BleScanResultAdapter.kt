@@ -8,11 +8,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.steleot.blekotlin.BleDevice
 import com.steleot.sample.databinding.ItemBleScanResultBinding
 
 class BleScanResultAdapter(
-    private val callbacks: Callbacks
+    private val viewModel: MainViewModel
 ) : ListAdapter<ScanResult, BleScanResultAdapter.ItemViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(
@@ -22,7 +21,7 @@ class BleScanResultAdapter(
         return ItemViewHolder(
             ItemBleScanResultBinding
                 .inflate(LayoutInflater.from(parent.context), parent, false),
-            callbacks
+            viewModel
         )
     }
 
@@ -50,7 +49,7 @@ class BleScanResultAdapter(
     @SuppressLint("SetTextI18n")
     class ItemViewHolder(
         private val binding: ItemBleScanResultBinding,
-        private val callbacks: Callbacks
+        private val viewModel: MainViewModel
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(
@@ -63,7 +62,7 @@ class BleScanResultAdapter(
             binding.bleAddress.text = "Ble Address: ${device.address}"
             updateRssi(rssi)
             itemView.setOnClickListener {
-                callbacks.handleDevice(scanResult.device)
+                viewModel.handleDevice(scanResult.device)
             }
         }
 
@@ -72,13 +71,6 @@ class BleScanResultAdapter(
         ) {
             binding.bleRssi.text = "Ble rssi: ${rssi}"
         }
-    }
-
-    interface Callbacks {
-
-        fun handleDevice(
-            bleDevice: BleDevice
-        )
     }
 }
 

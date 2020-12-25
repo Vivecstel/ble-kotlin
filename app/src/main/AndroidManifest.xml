@@ -23,7 +23,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.details.DetailsActivity" >
+        <activity
+            android:name=".ui.details.DetailsActivity"
+            android:theme="@style/Theme.BleKotlin.Details">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.main.MainActivity" />

@@ -10,8 +10,8 @@ import com.steleot.blekotlin.BleGattService
 import com.steleot.sample.databinding.ItemBleGattServicesBinding
 
 class BleGattServicesAdapter(
-    private val callbacks: Callbacks
-): ListAdapter<BleGattService, BleGattServicesAdapter.ItemViewHolder>(DiffCallback) {
+    private val viewModel: DetailsViewModel
+) : ListAdapter<BleGattService, BleGattServicesAdapter.ItemViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -20,7 +20,7 @@ class BleGattServicesAdapter(
         return ItemViewHolder(
             ItemBleGattServicesBinding
                 .inflate(LayoutInflater.from(parent.context), parent, false),
-            callbacks
+            viewModel
         )
     }
 
@@ -34,7 +34,7 @@ class BleGattServicesAdapter(
     @SuppressLint("SetTextI18n")
     class ItemViewHolder(
         private val binding: ItemBleGattServicesBinding,
-        private val callbacks: Callbacks
+        private val viewModel: DetailsViewModel
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(
@@ -42,11 +42,6 @@ class BleGattServicesAdapter(
         ) {
             // todo
         }
-    }
-
-    interface Callbacks {
-
-        fun action() // todo
     }
 }
 
