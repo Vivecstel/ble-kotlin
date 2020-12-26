@@ -13,15 +13,9 @@ import com.steleot.blekotlin.internal.UNKNOWN_STATUS
 import com.steleot.blekotlin.internal.UUID_16_BIT_LENGTH
 import com.steleot.blekotlin.internal.UUID_END_INDEX
 import com.steleot.blekotlin.internal.UUID_START_INDEX
-import com.steleot.blekotlin.utils.getCharacteristicName
-import com.steleot.blekotlin.utils.getDescriptorName
-import com.steleot.blekotlin.utils.getServiceName
-import com.steleot.blekotlin.utils.isBroadcastable
-import com.steleot.blekotlin.utils.isIndicatable
-import com.steleot.blekotlin.utils.isNotifiable
-import com.steleot.blekotlin.utils.isReadable
-import com.steleot.blekotlin.utils.isWritable
-import com.steleot.blekotlin.utils.isWritableWithoutResponse
+import com.steleot.blekotlin.internal.utils.isReadable
+import com.steleot.blekotlin.internal.utils.isWritable
+import com.steleot.blekotlin.utils.*
 import java.util.Locale
 import java.util.UUID
 
@@ -188,14 +182,6 @@ internal fun UUID.getStandardizedUuidAsString(): String {
  */
 internal fun String.toBluetoothUuid(): UUID {
     return UUID.fromString(this.toBluetoothUuidString())
-}
-
-/**
- * Extension function that returns the given [String] to bluetooth [String].
- */
-internal fun String.toBluetoothUuidString(): String {
-    require(this.length == UUID_16_BIT_LENGTH)
-    return "0000$this-0000-1000-8000-00805F9B34FB"
 }
 
 /**

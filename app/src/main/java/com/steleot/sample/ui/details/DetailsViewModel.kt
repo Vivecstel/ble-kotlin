@@ -9,6 +9,8 @@ import com.steleot.blekotlin.BleConnection
 import com.steleot.blekotlin.BleDevice
 import com.steleot.blekotlin.BleGattCharacteristic
 import com.steleot.blekotlin.BleGattService
+import com.steleot.blekotlin.constants.BleGattCharacteristicUuids
+import com.steleot.blekotlin.utils.toBluetoothUuidString
 import com.steleot.blekotlin.utils.toHexString
 import com.steleot.sample.ui.utils.Event
 import kotlin.random.Random
@@ -52,8 +54,14 @@ class DetailsViewModel(
                 }
                 status.bleGattCharacteristic?.let {
                     when (lastAction) {
-                        Action.READ -> _text.value = Event(
-                                "Read action: ${it.uuid} with: ${it.value.toHexString()}")
+                        Action.READ -> {
+                            var text = "Read action: ${it.uuid} with: ${it.value.toHexString()}"
+                            if (BleGattCharacteristicUuids.DEVICE_NAME.toBluetoothUuidString()
+                                    .equals(it.uuid.toString(), ignoreCase = true)) {
+                                text = "Read action: ${it.uuid} with: ${it.getStringValue(0)}"
+                            }
+                            _text.value = Event(text)
+                        }
                         Action.WRITE -> _text.value = Event(
                                 "Write action: ${it.uuid} with: ${it.value.toHexString()}")
                         Action.NOTIFY -> _text.value = Event(

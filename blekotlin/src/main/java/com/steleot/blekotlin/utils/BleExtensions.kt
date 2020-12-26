@@ -2,6 +2,7 @@ package com.steleot.blekotlin.utils
 
 import com.steleot.blekotlin.BleGattCharacteristic
 import com.steleot.blekotlin.internal.UNKNOWN_UUID
+import com.steleot.blekotlin.internal.UUID_16_BIT_LENGTH
 import com.steleot.blekotlin.internal.utils.gattCharacteristicUuids
 import com.steleot.blekotlin.internal.utils.gattDescriptorUuids
 import com.steleot.blekotlin.internal.utils.gattServicesUuids
@@ -79,6 +80,14 @@ fun BleGattCharacteristic.isIndicatable(): Boolean =
 
 private fun BleGattCharacteristic.containsProperty(property: Int): Boolean =
     properties and property != 0
+
+/**
+ * Extension function that returns the given [String] to bluetooth [String].
+ */
+fun String.toBluetoothUuidString(): String {
+    require(this.length == UUID_16_BIT_LENGTH)
+    return "0000$this-0000-1000-8000-00805F9B34FB"
+}
 
 /**
  * Extension function that returns the given [ByteArray] to hex [String] for logging purposes.
