@@ -4,7 +4,7 @@ package com.steleot.blekotlin
 
 import android.annotation.SuppressLint
 import android.content.Context
-import com.steleot.blekotlin.constants.BleGattDescriptors
+import com.steleot.blekotlin.constants.BleGattDescriptorUuids
 import com.steleot.blekotlin.helper.BleLogger
 import com.steleot.blekotlin.internal.*
 import com.steleot.blekotlin.internal.utils.*
@@ -18,6 +18,7 @@ import com.steleot.blekotlin.utils.isWritable
 import com.steleot.blekotlin.utils.isWritableWithoutResponse
 import com.steleot.blekotlin.utils.toHexString
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +40,7 @@ class BleConnection internal constructor(
 ) {
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
-    private var bleGatt: BleGatt? = null
+    private val deviceGattMap = ConcurrentHashMap<BleDevice, BleGatt>()
     private val operationsQueue = ConcurrentLinkedQueue<BleOperation>()
     private var pendingOperation: BleOperation? = null
     private var _status = MutableStateFlow(BleConnectionStatus())
@@ -51,163 +52,192 @@ class BleConnection internal constructor(
 
     /**
      * The connect function that starts a ble gatt connection.
+     * @param device: the [BleDevice] trying to connect.
+     * @param context: the [Context] needed for the [Connect] operation.
      */
     internal fun connect(
         device: BleDevice,
         context: Context
     ) {
-        if (bleGatt != null
-            && device.address == bleGatt!!.device.address
-        ) {
-            bleLogger.log(TAG, "Already connected to device ${device.address}")
+        if (device.isConnected()) {
+            bleLogger.log(TAG, "Already connected to device ${device.address}.")
         } else {
             enqueueOperation(Connect(device, context.applicationContext))
         }
     }
 
-    /**
-     * If it should reconnect to the ble device after bluetooth was disabled.
-     */
-    internal fun shouldReconnect() = bleGatt != null
+    private fun BleDevice.isConnected() = deviceGattMap.containsKey(this)
 
     /**
-     * The reconnect function that starts a ble gatt connection after the bluetooth was disabled and
-     * enabled again.
+     * If it should reconnect to the ble device after bluetooth was disabled.
+     * @param device: the [BleDevice] trying to reconnect.
+     */
+    internal fun shouldReconnect(
+        device: BleDevice
+    ) = device.isConnected()
+
+    /**
+     * The reconnect function that starts a ble gatt connection after the bluetooth was disabled
+     * and enabled again.
+     * @param device: the [BleDevice] trying to reconnect.
+     * @param context: the [Context] needed for the re [Connect] operation.
      */
     internal fun reconnect(
+        device: BleDevice,
         context: Context
     ) {
-        bleGatt?.let {
-            enqueueOperation(Connect(it.device, context.applicationContext))
+        if (device.isConnected()) {
+            enqueueOperation(Connect(device, context.applicationContext))
         }
     }
 
     /**
-     * Teardown the current connection.
+     * Teardown the ble gatt connection.
+     * @param device: the [BleDevice] trying to close the connection.
      */
-    fun teardownConnection() {
-        if (bleGatt != null) {
-            enqueueOperation(Disconnect(bleGatt!!.device))
+    fun teardownConnection(
+        device: BleDevice
+    ) {
+        if (device.isConnected()) {
+            enqueueOperation(Disconnect(device))
         } else {
             bleLogger.log(
-                TAG, "Not connected to any device. Cannot " +
-                        "teardown the connection."
+                TAG, "Not connected to ${device.address}. Cannot teardown the connection."
             )
         }
     }
 
     /**
      * Reads the specific characteristic [UUID] if possible.
+     * @param device: the [BleDevice] trying to read the characteristic from.
+     * @param characteristicUuid: the [UUID] trying to read from.
      */
     fun readCharacteristic(
+        device: BleDevice,
         characteristicUuid: UUID
     ) {
-        if (bleGatt != null) {
-            val device = bleGatt!!.device
+        if (device.isConnected()) {
             enqueueOperation(CharacteristicRead(device, characteristicUuid))
         } else {
-            bleLogger.log(TAG, "Not connected to any device, cannot read characteristic")
+            bleLogger.log(
+                TAG, "Not connected to ${device.address}. Cannot read characteristic."
+            )
         }
     }
 
     /**
      * Writes the specific characteristic [UUID] for the given [payload] if possible.
+     * @param device: the [BleDevice] trying to write the [payload] to the characteristic.
+     * @param characteristicUuid: the [UUID] trying to write to.
+     * @param payload: the[ByteArray] trying to write to characteristic.
      */
     fun writeCharacteristic(
+        device: BleDevice,
         characteristicUuid: UUID,
         payload: ByteArray
     ) {
-        if (bleGatt != null) {
-            val device = bleGatt!!.device
+        if (device.isConnected()) {
             enqueueOperation(CharacteristicWrite(device, characteristicUuid, payload))
         } else {
-            bleLogger.log(TAG, "Not connected to any device, cannot read characteristic")
+            bleLogger.log(
+                TAG, "Not connected to ${device.address}. Cannot write to characteristic."
+            )
         }
     }
 
     /**
      * Reads the specific descriptor [UUID] if possible.
+     * @param device: the [BleDevice] trying to read the descriptor from.
+     * @param descriptorUuid: the [UUID] trying to read from.
      */
     fun readDescriptor(
+        device: BleDevice,
         descriptorUuid: UUID
     ) {
-        if (bleGatt != null) {
-            val device = bleGatt!!.device
+        if (device.isConnected()) {
             enqueueOperation(DescriptorRead(device, descriptorUuid))
         } else {
             bleLogger.log(
-                TAG,
-                "Not connected to any device, cannot perform descriptor read"
+                TAG, "Not connected to ${device.address}. Cannot perform descriptor read."
             )
         }
     }
 
     /**
      * Writes the specific descriptor [UUID] for the given [payload] if possible.
+     * @param device: the [BleDevice] trying to write the [payload] to the descriptor.
+     * @param descriptorUuid: the [UUID] trying to write to.
+     * @param payload: the[ByteArray] trying to write to descriptor.
      */
     fun writeDescriptor(
+        device: BleDevice,
         descriptorUuid: UUID,
         payload: ByteArray
     ) {
-        if (bleGatt != null) {
-            val device = bleGatt!!.device
+        if (device.isConnected()) {
             enqueueOperation(DescriptorWrite(device, descriptorUuid, payload))
         } else {
             bleLogger.log(
-                TAG,
-                "Not connected to any device, cannot write descriptor"
+                TAG, "Not connected to ${device.address}. Cannot write to descriptor."
             )
         }
     }
 
     /**
      * Enables the notifications for the specific characteristic [UUID] if possible.
+     * @param device: the [BleDevice] trying to enable notifications.
+     * @param characteristicUuid: the [UUID] trying to enable notifications.
      */
     fun enableNotifications(
+        device: BleDevice,
         characteristicUuid: UUID
     ) {
-        handleNotifications(characteristicUuid)
+        handleNotifications(device, characteristicUuid)
     }
 
     private fun handleNotifications(
+        device: BleDevice,
         characteristicUuid: UUID,
         isEnable: Boolean = true
     ) {
-        if (bleGatt != null) {
-            val device = bleGatt!!.device
+        if (device.isConnected()) {
             enqueueOperation(
                 if (isEnable) EnableNotifications(device, characteristicUuid)
                 else DisableNotifications(device, characteristicUuid)
             )
         } else {
-            bleLogger.log(TAG, "Not connected to any device, cannot change notifications")
+            bleLogger.log(
+                TAG, "Not connected to ${device.address}. Cannot change notifications"
+            )
         }
     }
 
     /**
      * Disables the notifications for the specific characteristic [UUID] if possible.
+     * @param device: the [BleDevice] trying to disable notifications.
+     * @param characteristicUuid: the [UUID] trying to disable notifications.
      */
     fun disableNotifications(
+        device: BleDevice,
         characteristicUuid: UUID
     ) {
-        handleNotifications(characteristicUuid, false)
+        handleNotifications(device, characteristicUuid, false)
     }
 
     /**
      * Requests specific mtu for write operations. The default value is the [BLE_GATT_MAX_MTU_SIZE].
      * All values should be between min [BLE_GATT_MIN_MTU_SIZE] or max [BLE_GATT_MAX_MTU_SIZE] else
      * the [Int] give will coerce between them.
+     * @param device: the [BleDevice] trying to update the mtu.
+     * @param mtu: the [Int] value for the mtu operation.
      */
     fun requestMtu(
+        device: BleDevice,
         mtu: Int
     ) {
-        if (bleGatt != null) {
-            val device = bleGatt!!.device
+        if (device.isConnected()) {
             enqueueOperation(
-                MtuRequest(
-                    device,
-                    mtu.coerceIn(BLE_GATT_MIN_MTU_SIZE, BLE_GATT_MAX_MTU_SIZE)
-                )
+                MtuRequest(device, mtu.coerceIn(BLE_GATT_MIN_MTU_SIZE, BLE_GATT_MAX_MTU_SIZE))
             )
         } else {
             bleLogger.log(TAG, "Not connected to any device, cannot request MTU update!")
@@ -215,16 +245,26 @@ class BleConnection internal constructor(
     }
 
     /**
-     * Gets a list of the available [BleGattService] for the gatt connection.
+     * Gets a list of the available [BleGattService] for the gatt connection of the [BleDevice].
+     * @param device: the [BleDevice] to get all available services.
      */
-    fun getServicesOnDevice(): List<BleGattService>? = bleGatt?.services
+    fun getServicesOnDevice(
+        device: BleDevice
+    ): List<BleGattService> = deviceGattMap[device]?.services ?: emptyList()
+
 
     /**
-     * Clears the queue of all operations and removes last pending one.
+     * Force closing all open connections and Clears the queue of all operations and removes
+     * last pending one.
      */
-    internal fun removeAllOperations() {
+    internal fun forceTeardownAll() {
+        bleLogger.log(TAG, "Force closing all connections and operations.")
         operationsQueue.clear()
         pendingOperation = null
+        for ((_, bleGatt) in deviceGattMap) {
+            bleGatt.close()
+        }
+        deviceGattMap.clear()
     }
 
     @Synchronized
@@ -270,24 +310,25 @@ class BleConnection internal constructor(
             return
         }
 
-        if (bleGatt == null) {
-            bleLogger.log(
-                TAG, "Not connected to device ${operation.bleDevice.address}." +
-                        "Aborting operation."
-            )
-            signalEndOfOperation()
-            return
-        }
+        val gatt = deviceGattMap[operation.bleDevice]
+            ?: this@BleConnection.run {
+                bleLogger.log(
+                    TAG, "Not connected to device ${operation.bleDevice.address}." +
+                            "Aborting operation."
+                )
+                signalEndOfOperation()
+                return
+            }
 
         when (operation) {
-            is Disconnect -> handleDisconnect(operation, bleGatt!!)
-            is CharacteristicWrite -> handleCharacteristicWrite(operation, bleGatt!!)
-            is CharacteristicRead -> handleCharacteristicRead(operation, bleGatt!!)
-            is DescriptorWrite -> handleDescriptorWrite(operation, bleGatt!!)
-            is DescriptorRead -> handleDescriptorRead(operation, bleGatt!!)
-            is EnableNotifications -> handleEnableNotifications(operation, bleGatt!!)
-            is DisableNotifications -> handleDisableNotifications(operation, bleGatt!!)
-            is MtuRequest -> handleMtuRequest(operation, bleGatt!!)
+            is Disconnect -> handleDisconnect(operation, gatt)
+            is CharacteristicWrite -> handleCharacteristicWrite(operation, gatt)
+            is CharacteristicRead -> handleCharacteristicRead(operation, gatt)
+            is DescriptorWrite -> handleDescriptorWrite(operation, gatt)
+            is DescriptorRead -> handleDescriptorRead(operation, gatt)
+            is EnableNotifications -> handleEnableNotifications(operation, gatt)
+            is DisableNotifications -> handleDisableNotifications(operation, gatt)
+            is MtuRequest -> handleMtuRequest(operation, gatt)
             else -> signalEndOfOperation()
         }
     }
@@ -299,7 +340,7 @@ class BleConnection internal constructor(
         with(operation) {
             bleLogger.log(TAG, "Disconnecting from device ${bleDevice.address}")
             bleGatt.close()
-            this@BleConnection.bleGatt = null
+            deviceGattMap.remove(bleDevice)
             _status.value = BleConnectionStatus()
             signalEndOfOperation()
         }
@@ -427,7 +468,7 @@ class BleConnection internal constructor(
     ) {
         with(operation) {
             findCharacteristic(bleGatt, characteristicUuid) { characteristic ->
-                val uuid = BleGattDescriptors.CLIENT_CHARACTERISTIC_CONFIGURATION.toBluetoothUuid()
+                val uuid = BleGattDescriptorUuids.CLIENT_CHARACTERISTIC_CONFIGURATION.toBluetoothUuid()
                 val payload = when {
                     characteristic.isIndicatable() ->
                         BleGattDescriptor.ENABLE_INDICATION_VALUE
@@ -436,7 +477,7 @@ class BleConnection internal constructor(
                     else -> {
                         bleLogger.log(
                             TAG, characteristic.uuid.getCharacteristicName() +
-                                    "doesn't support notifications / indications"
+                                    " doesn't support notifications / indications"
                         )
                         signalEndOfOperation()
                         return@findCharacteristic
@@ -475,12 +516,12 @@ class BleConnection internal constructor(
                 if (!characteristic.isIndicatable() && !characteristic.isNotifiable()) {
                     bleLogger.log(
                         TAG, characteristic.uuid.getCharacteristicName() +
-                                "doesn't support notifications / indications"
+                                " doesn't support notifications / indications"
                     )
                     signalEndOfOperation()
                     return@findCharacteristic
                 }
-                val uuid = BleGattDescriptors.CLIENT_CHARACTERISTIC_CONFIGURATION.toBluetoothUuid()
+                val uuid = BleGattDescriptorUuids.CLIENT_CHARACTERISTIC_CONFIGURATION.toBluetoothUuid()
                 characteristic.getDescriptor(uuid)?.let { cccDescriptor ->
                     if (!bleGatt.setCharacteristicNotification(characteristic, false)) {
                         bleLogger.log(
@@ -526,11 +567,11 @@ class BleConnection internal constructor(
                 BleGatt.GATT_SUCCESS -> {
                     if (newState == BleProfile.STATE_CONNECTED) {
                         bleLogger.log(TAG, "Successfully connected to $deviceAddress")
-                        this@BleConnection.bleGatt = bleGatt
+                        deviceGattMap[bleGatt.device] = bleGatt
                         coroutineScope.launch { bleGatt.discoverServices() }
                     } else if (newState == BleProfile.STATE_DISCONNECTED) {
                         bleLogger.log(TAG, "Successfully disconnected from $deviceAddress")
-                        teardownConnection()
+                        teardownConnection(bleGatt.device)
                     }
                 }
                 BleGatt.GATT_INSUFFICIENT_ENCRYPTION,
@@ -542,16 +583,16 @@ class BleConnection internal constructor(
                     if (pendingOperation is Connect) {
                         signalEndOfOperation()
                     }
-                    teardownConnection()
+                    teardownConnection(bleGatt.device)
                 }
             }
         }
 
         override fun onServicesDiscovered(
-            gatt: BleGatt,
+            bleGatt: BleGatt,
             status: Int
         ) {
-            with(gatt) {
+            with(bleGatt) {
                 if (status == BleGatt.GATT_SUCCESS) {
                     bleLogger.log(
                         TAG, "Discovered ${services.size} services for " +
@@ -559,10 +600,10 @@ class BleConnection internal constructor(
                     )
                     printGattInformation(bleLogger, TAG)
                     requestMtu(BLE_GATT_MAX_MTU_SIZE)
-                    _status.value = _status.value.copy(isConnected = true, bleDevice = gatt.device)
+                    _status.value = _status.value.copy(isConnected = true, bleDevice = device)
                 } else {
                     bleLogger.log(TAG, "Service discovery failed due to status $status")
-                    teardownConnection()
+                    teardownConnection(device)
                 }
             }
 
@@ -572,13 +613,12 @@ class BleConnection internal constructor(
         }
 
         override fun onMtuChanged(
-            gatt: BleGatt,
+            bleGatt: BleGatt,
             mtu: Int,
             status: Int
         ) {
             bleLogger.log(
-                TAG, "Mtu changed to $mtu, success: " +
-                        "${status == BleGatt.GATT_SUCCESS}"
+                TAG, "Mtu changed to $mtu, success: ${status == BleGatt.GATT_SUCCESS}"
             )
             _status.value = _status.value.copy(mtuRequestValue = mtu)
             if (pendingOperation is MtuRequest) {
@@ -587,7 +627,7 @@ class BleConnection internal constructor(
         }
 
         override fun onCharacteristicRead(
-            gatt: BleGatt,
+            bleGatt: BleGatt,
             characteristic: BleGattCharacteristic,
             status: Int
         ) {
@@ -596,14 +636,13 @@ class BleConnection internal constructor(
                     BleGatt.GATT_SUCCESS -> {
                         bleLogger.log(
                             TAG, "Read characteristic " +
-                                    "${uuid.getCharacteristicName()} | value: ${value.toHexString()}"
+                                    "${uuid.getCharacteristicName()}|value: ${value.toHexString()}"
                         )
                         _status.value = _status.value.copy(bleGattCharacteristic = this)
                     }
                     BleGatt.GATT_READ_NOT_PERMITTED -> {
                         bleLogger.log(
-                            TAG, "Read not permitted " +
-                                    "for ${uuid.getCharacteristicName()}."
+                            TAG, "Read not permitted for ${uuid.getCharacteristicName()}."
                         )
                     }
                     else -> {
@@ -622,7 +661,7 @@ class BleConnection internal constructor(
         }
 
         override fun onCharacteristicWrite(
-            gatt: BleGatt,
+            bleGatt: BleGatt,
             characteristic: BleGattCharacteristic,
             status: Int
         ) {
@@ -637,8 +676,7 @@ class BleConnection internal constructor(
                     }
                     BleGatt.GATT_WRITE_NOT_PERMITTED -> {
                         bleLogger.log(
-                            TAG, "Write not permitted " +
-                                    "for ${uuid.getCharacteristicName()}."
+                            TAG, "Write not permitted for ${uuid.getCharacteristicName()}."
                         )
                     }
                     else -> {
@@ -657,7 +695,7 @@ class BleConnection internal constructor(
         }
 
         override fun onCharacteristicChanged(
-            gatt: BleGatt,
+            bleGatt: BleGatt,
             characteristic: BleGattCharacteristic
         ) {
             with(characteristic) {
@@ -670,7 +708,7 @@ class BleConnection internal constructor(
         }
 
         override fun onDescriptorRead(
-            gatt: BleGatt,
+            bleGatt: BleGatt,
             descriptor: BleGattDescriptor,
             status: Int
         ) {
@@ -705,7 +743,7 @@ class BleConnection internal constructor(
         }
 
         override fun onDescriptorWrite(
-            gatt: BleGatt,
+            bleGatt: BleGatt,
             descriptor: BleGattDescriptor,
             status: Int
         ) {

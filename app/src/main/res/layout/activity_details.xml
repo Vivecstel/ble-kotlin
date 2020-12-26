@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="16dp"
-            android:textColor="?android:textColorPrimaryInverse"
+            android:textColor="?attr/colorOnPrimary"
             tools:background="@color/green"
             tools:text="Status: Connected" />
 
@@ -30,7 +30,7 @@
             android:scaleType="fitXY"
             android:background="@android:color/transparent"
             android:layout_gravity="end|center_vertical"
-            android:tint="?android:colorPrimary"
+            android:tint="?attr/colorOnPrimary"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             tools:src="@drawable/ic_save" />

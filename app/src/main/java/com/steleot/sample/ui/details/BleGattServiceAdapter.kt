@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.steleot.blekotlin.BleGattService
 import com.steleot.blekotlin.utils.getCharacteristicName
 import com.steleot.blekotlin.utils.getServiceName
+import com.steleot.blekotlin.utils.isIndicatable
+import com.steleot.blekotlin.utils.isNotifiable
 import com.steleot.blekotlin.utils.isReadable
 import com.steleot.blekotlin.utils.isWritable
 import com.steleot.sample.databinding.ItemBleCharacteristicBinding
@@ -58,7 +60,8 @@ class BleGattServicesAdapter(
                 charBinding.writable.visibility =
                     if (characteristic.isWritable()) View.VISIBLE else View.GONE
                 charBinding.notifiable.visibility =
-                    if (characteristic.isReadable()) View.VISIBLE else View.GONE
+                    if (characteristic.isNotifiable() || characteristic.isIndicatable())
+                        View.VISIBLE else View.GONE
                 charBinding.readable.setOnClickListener {
                     viewModel.handleReadAction(characteristic)
                 }

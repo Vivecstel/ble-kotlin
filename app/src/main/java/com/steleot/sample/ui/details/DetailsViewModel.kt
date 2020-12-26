@@ -10,6 +10,7 @@ import com.steleot.blekotlin.BleDevice
 import com.steleot.blekotlin.BleGattCharacteristic
 import com.steleot.blekotlin.BleGattService
 import com.steleot.blekotlin.utils.toHexString
+import com.steleot.sample.ui.utils.Event
 import kotlin.random.Random
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -25,8 +26,8 @@ class DetailsViewModel(
     private val _connectionInfo = MutableLiveData(BleConnectionInfo())
     val connectionInfo: LiveData<BleConnectionInfo> = _connectionInfo
 
-    private val _text = MutableLiveData<String>()
-    val text: LiveData<String> = _text
+    private val _text = MutableLiveData<Event<String>>()
+    val text: LiveData<Event<String>> = _text
 
     private var lastAction = Action.NONE
 
@@ -41,7 +42,7 @@ class DetailsViewModel(
                 if (status.isConnected) {
                     _connectionInfo.value = _connectionInfo.value?.copy(
                         connectionStatus = true,
-                        services = connection.getServicesOnDevice() ?: emptyList()
+                        services = connection.getServicesOnDevice(bleDevice)
                     )
                 } else {
                     _connectionInfo.value = _connectionInfo.value?.copy(
@@ -51,14 +52,13 @@ class DetailsViewModel(
                 }
                 status.bleGattCharacteristic?.let {
                     when (lastAction) {
-                        Action.READ ->
-                            _text.value = "Read action: ${it.uuid} with: ${it.value.toHexString()}"
-                        Action.WRITE ->
-                            _text.value = "Write action: ${it.uuid} with: ${it.value.toHexString()}"
-                        Action.NOTIFY ->
-                            _text.value =
-                                "Notify action: ${it.uuid} with: ${it.value.toHexString()}"
-                        else -> _text.value = ""
+                        Action.READ -> _text.value = Event(
+                                "Read action: ${it.uuid} with: ${it.value.toHexString()}")
+                        Action.WRITE -> _text.value = Event(
+                                "Write action: ${it.uuid} with: ${it.value.toHexString()}")
+                        Action.NOTIFY -> _text.value = Event(
+                            "Notify action: ${it.uuid} with: ${it.value.toHexString()}")
+                        else -> _text.value = Event("")
                     }
                 }
             }
@@ -85,7 +85,7 @@ class DetailsViewModel(
     ) {
         Timber.d("Reading the value of characteristic.")
         lastAction = Action.READ
-        connection.readCharacteristic(bleGattCharacteristic.uuid)
+        connection.readCharacteristic(bleDevice, bleGattCharacteristic.uuid)
     }
 
     fun handleWriteAction(
@@ -94,7 +94,7 @@ class DetailsViewModel(
         Timber.d("Writing a random value to characteristic.")
         lastAction = Action.WRITE
         connection.writeCharacteristic(
-            bleGattCharacteristic.uuid, Random.nextBytes(ByteArray(4))
+            bleDevice, bleGattCharacteristic.uuid, Random.nextBytes(ByteArray(4))
         )
     }
 
@@ -103,11 +103,11 @@ class DetailsViewModel(
     ) {
         Timber.d("Creating notification for characteristic.")
         lastAction = Action.NOTIFY
-        connection.enableNotifications(bleGattCharacteristic.uuid)
+        connection.enableNotifications(bleDevice, bleGattCharacteristic.uuid)
     }
 
     override fun onCleared() {
-        connection.teardownConnection()
+        connection.teardownConnection(bleDevice)
     }
 }
 

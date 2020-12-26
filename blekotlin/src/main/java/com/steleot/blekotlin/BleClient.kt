@@ -55,6 +55,7 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
     private var lastSettings: BleScanSettings? = null
     private lateinit var bleScanCallback: BleScanCallback
     private lateinit var bleConnection: BleConnection
+    private var bleDevice: BleDevice? = null
 
     private val _status: MutableStateFlow<BleStatus> = MutableStateFlow(BleStatus.NotStarted)
 
@@ -178,6 +179,7 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
                     lastSettings = settings
                 }
                 isScanning = true
+                bleDevice = null
                 bleAdapter!!.bluetoothLeScanner!!.startScan(filters, settings, bleScanCallback)
             }
         }
@@ -228,7 +230,8 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
         bleDevice: BleDevice
     ): BleConnection {
         validateProperInitialization()
-        bleConnection.teardownConnection()
+        this.bleDevice = bleDevice
+        bleConnection.teardownConnection(bleDevice)
         stopBleScanInternal()
         weakContext?.get()?.let { context ->
             bleConnection.connect(bleDevice, context)
@@ -264,9 +267,11 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
         if (isEnabled) {
             bleLogger.log(TAG, "Bluetooth was enabled.")
             _status.value = BleStatus.BluetoothWasEnabled
-            if (bleConnection.shouldReconnect() && weakContext?.get() != null) {
+            if (bleDevice != null
+                && bleConnection.shouldReconnect(bleDevice!!)
+                && weakContext?.get() != null) {
                 bleLogger.log(TAG, "Trying to reconnect to ble device.")
-                bleConnection.reconnect(weakContext!!.get()!!)
+                bleConnection.reconnect(bleDevice!!, weakContext!!.get()!!)
             } else if (isScanning) {
                 bleLogger.log(TAG, "Trying to start ble scan again.")
                 startBleScanInternal(lastFilter, lastSettings!!)
@@ -283,9 +288,9 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
     ) {
         if (isBonded) {
             bleLogger.log(TAG, "Trying to reconnect to ble device after bonding success.")
-            bleConnection.reconnect(weakContext!!.get()!!)
+            bleConnection.reconnect(bleDevice!!, weakContext!!.get()!!)
         } else {
-            bleConnection.teardownConnection()
+            bleConnection.teardownConnection(bleDevice!!)
             if (isScanning) {
                 startBleScanInternal(
                     lastFilter,

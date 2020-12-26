@@ -76,8 +76,10 @@ class DetailsActivity : AppCompatActivity() {
             }
             (binding.recyclerView.adapter as BleGattServicesAdapter).submitList(info.services)
         }
-        viewModel.text.observe(this) {
-            if (it.isNotEmpty()) Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+        viewModel.text.observe(this) { event ->
+            event.getContentIfNotHandledOrReturnNull()?.let {
+                if (it.isNotEmpty()) Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

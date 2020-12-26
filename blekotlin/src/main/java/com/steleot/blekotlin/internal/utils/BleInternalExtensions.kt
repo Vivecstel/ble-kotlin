@@ -5,7 +5,7 @@ import android.content.pm.PackageManager.FEATURE_BLUETOOTH_LE
 import com.steleot.blekotlin.BleGatt
 import com.steleot.blekotlin.BleGattCharacteristic
 import com.steleot.blekotlin.BleGattDescriptor
-import com.steleot.blekotlin.constants.BleGattDescriptors
+import com.steleot.blekotlin.constants.BleGattDescriptorUuids
 import com.steleot.blekotlin.helper.BleLogger
 import com.steleot.blekotlin.internal.UNKNOWN_ERROR
 import com.steleot.blekotlin.internal.UNKNOWN_STATE
@@ -200,10 +200,10 @@ internal fun String.toBluetoothUuidString(): String {
 
 /**
  * Extension function that checks if the given [BleGattDescriptor] is of
- * [BleGattDescriptors.CLIENT_CHARACTERISTIC_CONFIGURATION] that is needed for enabling / disabling
+ * [BleGattDescriptorUuids.CLIENT_CHARACTERISTIC_CONFIGURATION] that is needed for enabling / disabling
  * notification for [BleGattCharacteristic].
  */
 internal fun BleGattDescriptor.isClientCharacteristicConfigurationDescriptor(): Boolean {
-    return BleGattDescriptors.CLIENT_CHARACTERISTIC_CONFIGURATION.toBluetoothUuidString()
+    return BleGattDescriptorUuids.CLIENT_CHARACTERISTIC_CONFIGURATION.toBluetoothUuidString()
         .equals(uuid.toString(), ignoreCase = true)
 }

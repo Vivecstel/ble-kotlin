@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:elevation="5dp"
-    app:cardBackgroundColor="?android:colorPrimary"
+    app:cardBackgroundColor="?attr/colorPrimary"
     app:cardCornerRadius="4dp"
     tools:ignore="ContentDescription,HardcodedText">
 
@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:textColor="?android:textColorPrimaryInverse"
+            android:textColor="?attr/colorOnPrimary"
             android:text="Service" />
 
         <TextView
@@ -34,7 +34,7 @@
             android:layout_below="@id/service_label"
             android:layout_alignParentStart="true"
             android:layout_marginTop="4dp"
-            android:textColor="?android:textColorPrimaryInverse"
+            android:textColor="?attr/colorOnPrimary"
             tools:text="Ble Address" />
 
         <LinearLayout

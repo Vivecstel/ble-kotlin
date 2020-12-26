@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:background="?android:colorPrimary"
+    tools:background="?attr/colorPrimary"
     tools:ignore="HardcodedText">
 
     <TextView
@@ -12,7 +12,7 @@
         style="@style/TextAppearance.AppCompat.Body2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="?android:textColorPrimaryInverse"
+        android:textColor="?attr/colorOnPrimary"
         android:text="Characteristic:" />
 
     <TextView
@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:textColor="?android:textColorPrimaryInverse"
+        android:textColor="?attr/colorOnPrimary"
         tools:text="Ble Address" />
 
     <LinearLayout
@@ -31,7 +31,7 @@
 
         <Button
             android:id="@+id/readable"
-            style="?android:buttonBarStyle"
+            style="?attr/buttonBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
@@ -39,7 +39,7 @@
 
         <Button
             android:id="@+id/writable"
-            style="?android:buttonBarStyle"
+            style="?attr/buttonBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
@@ -47,7 +47,7 @@
 
         <Button
             android:id="@+id/notifiable"
-            style="?android:buttonBarStyle"
+            style="?attr/buttonBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
