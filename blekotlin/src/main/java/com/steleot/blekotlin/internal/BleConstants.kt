@@ -16,7 +16,12 @@ internal const val UNKNOWN_STATUS = "Unknown status"
 internal const val UNKNOWN_STATE = "Unknown state"
 
 /**
- * Unknown uuis for logging purposes.
+ * Unknown company for logging purposes.
+ */
+internal const val UNKNOWN_COMPANY = "Unknown company"
+
+/**
+ * Unknown uuid for logging purposes.
  */
 internal const val UNKNOWN_UUID = "Unknown uuid"
 

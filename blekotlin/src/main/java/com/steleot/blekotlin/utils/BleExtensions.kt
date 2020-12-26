@@ -3,11 +3,20 @@ package com.steleot.blekotlin.utils
 import com.steleot.blekotlin.BleGattCharacteristic
 import com.steleot.blekotlin.internal.UNKNOWN_UUID
 import com.steleot.blekotlin.internal.UUID_16_BIT_LENGTH
+import com.steleot.blekotlin.internal.utils.*
 import com.steleot.blekotlin.internal.utils.gattCharacteristicUuids
 import com.steleot.blekotlin.internal.utils.gattDescriptorUuids
 import com.steleot.blekotlin.internal.utils.gattServicesUuids
 import com.steleot.blekotlin.internal.utils.getStandardizedUuidAsString
 import java.util.UUID
+
+/**
+ * Extension function that returns the bluetooth compant name for logging purposes.
+ */
+fun Int.getCompanyName(): String {
+    val name = bleCompanies.getOrElse(this) { UNKNOWN_UUID }
+    return "$name - $this"
+}
 
 /**
  * Extension function that returns the [UUID] service name for logging purposes.

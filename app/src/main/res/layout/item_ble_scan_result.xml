@@ -62,6 +62,18 @@
             android:textColor="?attr/colorOnPrimary"
             tools:text="Ble Address" />
 
+        <TextView
+            android:id="@+id/ble_company"
+            style="@style/TextAppearance.AppCompat.Caption"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ble_address"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="4dp"
+            android:layout_toStartOf="@id/is_saved"
+            android:textColor="?attr/colorOnPrimary"
+            tools:text="Ble Company" />
+
     </RelativeLayout>
 
 </androidx.cardview.widget.CardView>

@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.util.keyIterator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.steleot.blekotlin.utils.getCompanyName
 import com.steleot.sample.databinding.ItemBleScanResultBinding
 
 class BleScanResultAdapter(
@@ -60,6 +62,10 @@ class BleScanResultAdapter(
             binding.bleName.text =
                 "Ble Device: ${if (device.name != null) device.name else "not available"}"
             binding.bleAddress.text = "Ble Address: ${device.address}"
+            item.first.scanRecord?.manufacturerSpecificData?.keyIterator()?.forEach { key ->
+                binding.bleCompany.text = "Ble Company: ${key.getCompanyName()}"
+                return@forEach
+            }
             binding.isSaved.visibility = if (item.second) View.VISIBLE else View.GONE
             updateRssi(rssi)
             itemView.setOnClickListener {
