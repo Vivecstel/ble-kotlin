@@ -2,7 +2,9 @@
 
 ## Introduction
 
-BleKotlin is a small but powerful Android Ble Kotlin library with coroutines and flows. 
+BleKotlin is a small but powerful Android Ble Kotlin library with coroutines and flows.
+
+<img src="screenshots/device-2020-12-27-123344.gif" width="250" />
 
 ## Installation
 
