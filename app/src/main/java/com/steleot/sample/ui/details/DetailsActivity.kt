@@ -10,23 +10,23 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.skydoves.bundler.bundleNonNull
-import com.steleot.blekotlin.BleDevice
+import com.steleot.blekotlin.BleScanResult
 import com.steleot.sample.R
 import com.steleot.sample.databinding.ActivityDetailsBinding
-import com.steleot.sample.ui.BLE_DEVICE
 import com.steleot.sample.ui.IS_SAVED
+import com.steleot.sample.ui.SCAN_RESULT
 
 @SuppressLint("SetTextI18n")
 class DetailsActivity : AppCompatActivity() {
 
-    private val bleDevice: BleDevice by bundleNonNull(BLE_DEVICE)
+    private val scanResult: BleScanResult by bundleNonNull(SCAN_RESULT)
     private val isSaved: Boolean by bundleNonNull(IS_SAVED)
     private val viewModel: DetailsViewModel by viewModels {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return if (modelClass === DetailsViewModel::class.java) {
                     @Suppress("UNCHECKED_CAST")
-                    DetailsViewModel(bleDevice, isSaved) as T
+                    DetailsViewModel(scanResult, isSaved) as T
                 } else error("")
             }
         }
@@ -52,7 +52,7 @@ class DetailsActivity : AppCompatActivity() {
     }
 
     private fun initRecyclerView() {
-        val adapter = BleGattServicesAdapter(viewModel)
+        val adapter = BleGattServiceAdapter(viewModel)
         binding.recyclerView.adapter = adapter
     }
 
@@ -74,7 +74,9 @@ class DetailsActivity : AppCompatActivity() {
                     ContextCompat.getColor(this, R.color.red)
                 )
             }
-            (binding.recyclerView.adapter as BleGattServicesAdapter).submitList(info.services)
+            binding.bleManufacturerName.text = info.manufacturerName
+            binding.bleManufacturerValue.text = info.manufacturerValue
+            (binding.recyclerView.adapter as BleGattServiceAdapter).submitList(info.services)
         }
         viewModel.text.observe(this) { event ->
             event.getContentIfNotHandledOrReturnNull()?.let {

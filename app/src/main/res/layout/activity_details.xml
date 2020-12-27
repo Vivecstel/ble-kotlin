@@ -1,47 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.steleot.sample.ui.details.DetailsActivity"
-    tools:ignore="ContentDescription">
+    android:layout_height="wrap_content">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/connection_status"
-            style="@style/TextAppearance.AppCompat.Body1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="16dp"
-            android:textColor="?attr/colorOnPrimary"
-            tools:background="@color/green"
-            tools:text="Status: Connected" />
-
-        <ImageButton
-            android:id="@+id/action_button"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:scaleType="fitXY"
-            android:background="@android:color/transparent"
-            android:layout_gravity="end|center_vertical"
-            android:tint="?attr/colorOnPrimary"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            tools:src="@drawable/ic_save" />
-
-    </FrameLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_ble_gatt_service" />
+        android:orientation="vertical"
+        tools:context="com.steleot.sample.ui.details.DetailsActivity"
+        tools:ignore="ContentDescription">
 
-</LinearLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/connection_status"
+                style="@style/TextAppearance.BleKotlin.Body2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="16dp"
+                tools:background="@color/green"
+                tools:text="Status: Connected" />
+
+            <ImageButton
+                android:id="@+id/action_button"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@android:color/transparent"
+                android:scaleType="fitXY"
+                android:tint="?attr/colorOnPrimary"
+                tools:src="@drawable/ic_save" />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/ble_manufacturer_name"
+                style="@style/TextAppearance.BleKotlin.Body2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="?attr/colorPrimary"
+                tools:text="Ble Manufacturer" />
+
+            <TextView
+                android:id="@+id/ble_manufacturer_value"
+                style="@style/TextAppearance.BleKotlin.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:textColor="?attr/colorPrimary"
+                tools:text="Ble Manufacturer Value" />
+
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_ble_gatt_service" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

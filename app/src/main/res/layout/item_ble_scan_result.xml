@@ -18,61 +18,56 @@
 
         <TextView
             android:id="@+id/ble_rssi"
-            style="@style/TextAppearance.AppCompat.Body2"
+            style="@style/TextAppearance.BleKotlin.Body2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:textColor="?attr/colorOnPrimary"
             tools:text="Ble Rssi" />
 
         <ImageView
             android:id="@+id/is_saved"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_save"
-            app:tint="?attr/colorOnPrimary"
-            android:layout_toStartOf="@id/ble_rssi"
-            android:layout_centerVertical="true"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentTop="true"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:layout_toStartOf="@id/ble_rssi"
+            android:src="@drawable/ic_save"
             android:visibility="gone"
+            app:tint="?attr/colorOnPrimary"
             tools:visibility="visible" />
 
         <TextView
             android:id="@+id/ble_name"
-            style="@style/TextAppearance.AppCompat.Body2"
+            style="@style/TextAppearance.BleKotlin.Body2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_toStartOf="@id/is_saved"
-            android:textColor="?attr/colorOnPrimary"
             tools:text="Ble Device" />
 
         <TextView
             android:id="@+id/ble_address"
-            style="@style/TextAppearance.AppCompat.Caption"
+            style="@style/TextAppearance.BleKotlin.Caption.MaxLines"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_below="@id/ble_name"
             android:layout_alignParentStart="true"
-            android:layout_marginTop="4dp"
-            android:layout_toStartOf="@id/is_saved"
-            android:textColor="?attr/colorOnPrimary"
+            android:layout_alignParentEnd="true"
             tools:text="Ble Address" />
 
         <TextView
-            android:id="@+id/ble_company"
-            style="@style/TextAppearance.AppCompat.Caption"
+            android:id="@+id/ble_manufacturer_name"
+            style="@style/TextAppearance.BleKotlin.Caption.MaxLines"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_below="@id/ble_address"
             android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
             android:layout_marginTop="4dp"
-            android:layout_toStartOf="@id/is_saved"
-            android:textColor="?attr/colorOnPrimary"
-            tools:text="Ble Company" />
+            tools:text="Ble Manufacturer" />
 
     </RelativeLayout>
 

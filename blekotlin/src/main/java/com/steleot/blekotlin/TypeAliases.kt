@@ -50,6 +50,11 @@ typealias BleScanCallback = ScanCallback
 typealias BleScanResult = ScanResult
 
 /**
+ * Type alias for [Pair] of [Int] manufacturer key and [ByteArray] manufacturer data.
+ */
+typealias BleManufacturerData = Pair<Int, ByteArray>
+
+/**
  * Type alias for [BluetoothDevice].
  */
 typealias BleDevice = BluetoothDevice

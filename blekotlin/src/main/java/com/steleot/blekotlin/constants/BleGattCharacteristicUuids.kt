@@ -143,7 +143,7 @@ object BleGattCharacteristicUuids {
     const val CGM_SESSION_START_TIME = "2AAA"
     const val CGM_SESSION_RUN_TIME = "2AAB"
     const val CGM_SPECIFIC_OPS_CONTROL_POINT = "2AAC"
-    const val INDOOR_POSITIONING_CONFIGURATION= "2AAD"
+    const val INDOOR_POSITIONING_CONFIGURATION = "2AAD"
     const val LATITUDE = "2AAE"
     const val LONGITUDE = "2AAF"
     const val LOCAL_NORTH_COORDINATE = "2AB0"

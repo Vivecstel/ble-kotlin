@@ -4,7 +4,7 @@ import android.content.Context
 import com.steleot.blekotlin.BleDevice
 import java.util.UUID
 
-sealed class BleOperation {
+internal sealed class BleOperation {
     abstract val bleDevice: BleDevice
 }
 
@@ -84,7 +84,7 @@ internal data class DisableNotifications(
     val characteristicUuid: UUID
 ) : BleOperation()
 
-data class MtuRequest(
+internal data class MtuRequest(
     override val bleDevice: BleDevice,
     val mtu: Int
 ) : BleOperation()

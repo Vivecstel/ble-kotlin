@@ -150,3 +150,5 @@ style:
     active: true
   NewLineAtEndOfFile:
     active: false
+  WildcardImport:
+    active: false

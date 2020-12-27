@@ -1,9 +1,11 @@
 package com.steleot.blekotlin.utils
 
 import com.steleot.blekotlin.BleGattCharacteristic
+import com.steleot.blekotlin.BleManufacturerData
+import com.steleot.blekotlin.BleScanResult
 import com.steleot.blekotlin.internal.UNKNOWN_UUID
 import com.steleot.blekotlin.internal.UUID_16_BIT_LENGTH
-import com.steleot.blekotlin.internal.utils.*
+import com.steleot.blekotlin.internal.utils.bleCompanies
 import com.steleot.blekotlin.internal.utils.gattCharacteristicUuids
 import com.steleot.blekotlin.internal.utils.gattDescriptorUuids
 import com.steleot.blekotlin.internal.utils.gattServicesUuids
@@ -11,9 +13,23 @@ import com.steleot.blekotlin.internal.utils.getStandardizedUuidAsString
 import java.util.UUID
 
 /**
- * Extension function that returns the bluetooth compant name for logging purposes.
+ * todo stelios
  */
-fun Int.getCompanyName(): String {
+fun BleScanResult.getManufacturerData(): BleManufacturerData? {
+    this.scanRecord?.let {
+        for (index in 0 until it.manufacturerSpecificData.size()) {
+            val key = it.manufacturerSpecificData.keyAt(index)
+            val value = it.manufacturerSpecificData.valueAt(index)
+            return key to value
+        }
+    }
+    return null
+}
+
+/**
+ * Extension function that returns the bluetooth manufacturer name for logging purposes.
+ */
+fun Int.getManufacturerName(): String {
     val name = bleCompanies.getOrElse(this) { UNKNOWN_UUID }
     return "$name - $this"
 }

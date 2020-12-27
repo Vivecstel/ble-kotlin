@@ -17,9 +17,6 @@ import com.steleot.blekotlin.utils.isReadable
 import com.steleot.blekotlin.utils.isWritable
 import com.steleot.blekotlin.utils.isWritableWithoutResponse
 import com.steleot.blekotlin.utils.toHexString
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -27,6 +24,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedQueue
 
 private const val TAG = "BleConnection"
 
@@ -36,7 +36,7 @@ private const val TAG = "BleConnection"
  */
 @SuppressLint("MissingPermission") // private constructor
 class BleConnection internal constructor(
-    private val bleLogger: BleLogger
+        private val bleLogger: BleLogger
 ) {
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
@@ -56,8 +56,8 @@ class BleConnection internal constructor(
      * @param context: the [Context] needed for the [Connect] operation.
      */
     internal fun connect(
-        device: BleDevice,
-        context: Context
+            device: BleDevice,
+            context: Context
     ) {
         if (device.isConnected()) {
             bleLogger.log(TAG, "Already connected to device ${device.address}.")
@@ -73,7 +73,7 @@ class BleConnection internal constructor(
      * @param device: the [BleDevice] trying to reconnect.
      */
     internal fun shouldReconnect(
-        device: BleDevice
+            device: BleDevice
     ) = device.isConnected()
 
     /**
@@ -83,8 +83,8 @@ class BleConnection internal constructor(
      * @param context: the [Context] needed for the re [Connect] operation.
      */
     internal fun reconnect(
-        device: BleDevice,
-        context: Context
+            device: BleDevice,
+            context: Context
     ) {
         if (device.isConnected()) {
             enqueueOperation(Connect(device, context.applicationContext))
@@ -96,13 +96,13 @@ class BleConnection internal constructor(
      * @param device: the [BleDevice] trying to close the connection.
      */
     fun teardownConnection(
-        device: BleDevice
+            device: BleDevice
     ) {
         if (device.isConnected()) {
             enqueueOperation(Disconnect(device))
         } else {
             bleLogger.log(
-                TAG, "Not connected to ${device.address}. Cannot teardown the connection."
+                    TAG, "Not connected to ${device.address}. Cannot teardown the connection."
             )
         }
     }
@@ -113,14 +113,14 @@ class BleConnection internal constructor(
      * @param characteristicUuid: the [UUID] trying to read from.
      */
     fun readCharacteristic(
-        device: BleDevice,
-        characteristicUuid: UUID
+            device: BleDevice,
+            characteristicUuid: UUID
     ) {
         if (device.isConnected()) {
             enqueueOperation(CharacteristicRead(device, characteristicUuid))
         } else {
             bleLogger.log(
-                TAG, "Not connected to ${device.address}. Cannot read characteristic."
+                    TAG, "Not connected to ${device.address}. Cannot read characteristic."
             )
         }
     }
@@ -132,15 +132,15 @@ class BleConnection internal constructor(
      * @param payload: the[ByteArray] trying to write to characteristic.
      */
     fun writeCharacteristic(
-        device: BleDevice,
-        characteristicUuid: UUID,
-        payload: ByteArray
+            device: BleDevice,
+            characteristicUuid: UUID,
+            payload: ByteArray
     ) {
         if (device.isConnected()) {
             enqueueOperation(CharacteristicWrite(device, characteristicUuid, payload))
         } else {
             bleLogger.log(
-                TAG, "Not connected to ${device.address}. Cannot write to characteristic."
+                    TAG, "Not connected to ${device.address}. Cannot write to characteristic."
             )
         }
     }
@@ -151,14 +151,14 @@ class BleConnection internal constructor(
      * @param descriptorUuid: the [UUID] trying to read from.
      */
     fun readDescriptor(
-        device: BleDevice,
-        descriptorUuid: UUID
+            device: BleDevice,
+            descriptorUuid: UUID
     ) {
         if (device.isConnected()) {
             enqueueOperation(DescriptorRead(device, descriptorUuid))
         } else {
             bleLogger.log(
-                TAG, "Not connected to ${device.address}. Cannot perform descriptor read."
+                    TAG, "Not connected to ${device.address}. Cannot perform descriptor read."
             )
         }
     }
@@ -170,15 +170,15 @@ class BleConnection internal constructor(
      * @param payload: the[ByteArray] trying to write to descriptor.
      */
     fun writeDescriptor(
-        device: BleDevice,
-        descriptorUuid: UUID,
-        payload: ByteArray
+            device: BleDevice,
+            descriptorUuid: UUID,
+            payload: ByteArray
     ) {
         if (device.isConnected()) {
             enqueueOperation(DescriptorWrite(device, descriptorUuid, payload))
         } else {
             bleLogger.log(
-                TAG, "Not connected to ${device.address}. Cannot write to descriptor."
+                    TAG, "Not connected to ${device.address}. Cannot write to descriptor."
             )
         }
     }
@@ -189,25 +189,25 @@ class BleConnection internal constructor(
      * @param characteristicUuid: the [UUID] trying to enable notifications.
      */
     fun enableNotifications(
-        device: BleDevice,
-        characteristicUuid: UUID
+            device: BleDevice,
+            characteristicUuid: UUID
     ) {
         handleNotifications(device, characteristicUuid)
     }
 
     private fun handleNotifications(
-        device: BleDevice,
-        characteristicUuid: UUID,
-        isEnable: Boolean = true
+            device: BleDevice,
+            characteristicUuid: UUID,
+            isEnable: Boolean = true
     ) {
         if (device.isConnected()) {
             enqueueOperation(
-                if (isEnable) EnableNotifications(device, characteristicUuid)
-                else DisableNotifications(device, characteristicUuid)
+                    if (isEnable) EnableNotifications(device, characteristicUuid)
+                    else DisableNotifications(device, characteristicUuid)
             )
         } else {
             bleLogger.log(
-                TAG, "Not connected to ${device.address}. Cannot change notifications"
+                    TAG, "Not connected to ${device.address}. Cannot change notifications"
             )
         }
     }
@@ -218,8 +218,8 @@ class BleConnection internal constructor(
      * @param characteristicUuid: the [UUID] trying to disable notifications.
      */
     fun disableNotifications(
-        device: BleDevice,
-        characteristicUuid: UUID
+            device: BleDevice,
+            characteristicUuid: UUID
     ) {
         handleNotifications(device, characteristicUuid, false)
     }
@@ -232,12 +232,12 @@ class BleConnection internal constructor(
      * @param mtu: the [Int] value for the mtu operation.
      */
     fun requestMtu(
-        device: BleDevice,
-        mtu: Int
+            device: BleDevice,
+            mtu: Int
     ) {
         if (device.isConnected()) {
             enqueueOperation(
-                MtuRequest(device, mtu.coerceIn(BLE_GATT_MIN_MTU_SIZE, BLE_GATT_MAX_MTU_SIZE))
+                    MtuRequest(device, mtu.coerceIn(BLE_GATT_MIN_MTU_SIZE, BLE_GATT_MAX_MTU_SIZE))
             )
         } else {
             bleLogger.log(TAG, "Not connected to any device, cannot request MTU update!")
@@ -249,7 +249,7 @@ class BleConnection internal constructor(
      * @param device: the [BleDevice] to get all available services.
      */
     fun getServicesOnDevice(
-        device: BleDevice
+            device: BleDevice
     ): List<BleGattService> = deviceGattMap[device]?.services ?: emptyList()
 
 
@@ -269,7 +269,7 @@ class BleConnection internal constructor(
 
     @Synchronized
     private fun enqueueOperation(
-        operation: BleOperation
+            operation: BleOperation
     ) {
         operationsQueue.add(operation)
         if (pendingOperation == null) {
@@ -311,14 +311,14 @@ class BleConnection internal constructor(
         }
 
         val gatt = deviceGattMap[operation.bleDevice]
-            ?: this@BleConnection.run {
-                bleLogger.log(
-                    TAG, "Not connected to device ${operation.bleDevice.address}." +
+                ?: this@BleConnection.run {
+                    bleLogger.log(
+                            TAG, "Not connected to device ${operation.bleDevice.address}." +
                             "Aborting operation."
-                )
-                signalEndOfOperation()
-                return
-            }
+                    )
+                    signalEndOfOperation()
+                    return
+                }
 
         when (operation) {
             is Disconnect -> handleDisconnect(operation, gatt)
@@ -334,8 +334,8 @@ class BleConnection internal constructor(
     }
 
     private fun handleDisconnect(
-        operation: Disconnect,
-        bleGatt: BleGatt
+            operation: Disconnect,
+            bleGatt: BleGatt
     ) {
         with(operation) {
             bleLogger.log(TAG, "Disconnecting from device ${bleDevice.address}")
@@ -347,20 +347,20 @@ class BleConnection internal constructor(
     }
 
     private fun handleCharacteristicWrite(
-        operation: CharacteristicWrite,
-        bleGatt: BleGatt
+            operation: CharacteristicWrite,
+            bleGatt: BleGatt
     ) {
         with(operation) {
             findCharacteristic(bleGatt, characteristicUuid) { characteristic ->
                 val writeType = when {
                     characteristic.isWritable() -> BleGattCharacteristic.WRITE_TYPE_DEFAULT
                     characteristic.isWritableWithoutResponse() -> BleGattCharacteristic
-                        .WRITE_TYPE_NO_RESPONSE
+                            .WRITE_TYPE_NO_RESPONSE
                     else -> {
                         bleLogger.log(TAG, "")
                         bleLogger.log(
-                            TAG, characteristic.uuid.getCharacteristicName() +
-                                    " isn't writable."
+                                TAG, characteristic.uuid.getCharacteristicName() +
+                                " isn't writable."
                         )
                         signalEndOfOperation()
                         return@findCharacteristic
@@ -374,32 +374,32 @@ class BleConnection internal constructor(
     }
 
     private fun findCharacteristic(
-        bleGatt: BleGatt,
-        characteristicUuid: UUID,
-        successBlock: (BleGattCharacteristic) -> Unit
+            bleGatt: BleGatt,
+            characteristicUuid: UUID,
+            successBlock: (BleGattCharacteristic) -> Unit
     ) {
         bleGatt.findCharacteristic(characteristicUuid)?.let {
             successBlock(it)
         } ?: run {
             bleLogger.log(
-                TAG, "Cannot find characteristic " +
-                        "${characteristicUuid.getCharacteristicName()}. Ending operation.."
+                    TAG, "Cannot find characteristic " +
+                    "${characteristicUuid.getCharacteristicName()}. Ending operation.."
             )
             signalEndOfOperation()
         }
     }
 
     private fun handleCharacteristicRead(
-        operation: CharacteristicRead,
-        bleGatt: BleGatt
+            operation: CharacteristicRead,
+            bleGatt: BleGatt
     ) {
         with(operation) {
             findCharacteristic(bleGatt, characteristicUuid) { characteristic ->
                 if (characteristic.isReadable()) bleGatt.readCharacteristic(characteristic)
                 else {
                     bleLogger.log(
-                        TAG, characteristic.uuid.getCharacteristicName() +
-                                " isn't readable."
+                            TAG, characteristic.uuid.getCharacteristicName() +
+                            " isn't readable."
                     )
                     signalEndOfOperation()
                 }
@@ -408,18 +408,18 @@ class BleConnection internal constructor(
     }
 
     private fun handleDescriptorWrite(
-        operation: DescriptorWrite,
-        bleGatt: BleGatt
+            operation: DescriptorWrite,
+            bleGatt: BleGatt
     ) {
         with(operation) {
             findDescriptor(bleGatt, descriptorUuid) { descriptor ->
                 if (descriptor.isWritable()
-                    || descriptor.isClientCharacteristicConfigurationDescriptor()
+                        || descriptor.isClientCharacteristicConfigurationDescriptor()
                 ) {
                     bleGatt.writeDescriptor(descriptor)
                 } else {
                     bleLogger.log(
-                        TAG, "${descriptor.uuid.getDescriptorName()} isn't writable."
+                            TAG, "${descriptor.uuid.getDescriptorName()} isn't writable."
                     )
                     signalEndOfOperation()
                 }
@@ -428,24 +428,24 @@ class BleConnection internal constructor(
     }
 
     private fun findDescriptor(
-        bleGatt: BleGatt,
-        descriptorUuid: UUID,
-        successBlock: (BleGattDescriptor) -> Unit
+            bleGatt: BleGatt,
+            descriptorUuid: UUID,
+            successBlock: (BleGattDescriptor) -> Unit
     ) {
         bleGatt.findDescriptor(descriptorUuid)?.let {
             successBlock(it)
         } ?: run {
             bleLogger.log(
-                TAG, "Cannot find descriptor " +
-                        "${descriptorUuid.getDescriptorName()}. Ending operation.."
+                    TAG, "Cannot find descriptor " +
+                    "${descriptorUuid.getDescriptorName()}. Ending operation.."
             )
             signalEndOfOperation()
         }
     }
 
     private fun handleDescriptorRead(
-        operation: DescriptorRead,
-        bleGatt: BleGatt
+            operation: DescriptorRead,
+            bleGatt: BleGatt
     ) {
         with(operation) {
             findDescriptor(bleGatt, descriptorUuid) { descriptor ->
@@ -453,8 +453,8 @@ class BleConnection internal constructor(
                     bleGatt.readDescriptor(descriptor)
                 } else {
                     bleLogger.log(
-                        TAG, descriptor.uuid.getDescriptorName() +
-                                " isn't readable."
+                            TAG, descriptor.uuid.getDescriptorName() +
+                            " isn't readable."
                     )
                     signalEndOfOperation()
                 }
@@ -463,12 +463,13 @@ class BleConnection internal constructor(
     }
 
     private fun handleEnableNotifications(
-        operation: EnableNotifications,
-        bleGatt: BleGatt
+            operation: EnableNotifications,
+            bleGatt: BleGatt
     ) {
         with(operation) {
             findCharacteristic(bleGatt, characteristicUuid) { characteristic ->
-                val uuid = BleGattDescriptorUuids.CLIENT_CHARACTERISTIC_CONFIGURATION.toBluetoothUuid()
+                val uuid =
+                        BleGattDescriptorUuids.CLIENT_CHARACTERISTIC_CONFIGURATION.toBluetoothUuid()
                 val payload = when {
                     characteristic.isIndicatable() ->
                         BleGattDescriptor.ENABLE_INDICATION_VALUE
@@ -476,8 +477,8 @@ class BleConnection internal constructor(
                         BleGattDescriptor.ENABLE_NOTIFICATION_VALUE
                     else -> {
                         bleLogger.log(
-                            TAG, characteristic.uuid.getCharacteristicName() +
-                                    " doesn't support notifications / indications"
+                                TAG, characteristic.uuid.getCharacteristicName() +
+                                " doesn't support notifications / indications"
                         )
                         signalEndOfOperation()
                         return@findCharacteristic
@@ -486,8 +487,8 @@ class BleConnection internal constructor(
                 characteristic.getDescriptor(uuid)?.let { descriptor ->
                     if (!bleGatt.setCharacteristicNotification(characteristic, true)) {
                         bleLogger.log(
-                            TAG, "Setting notification failed for " +
-                                    characteristic.uuid.getDescriptorName()
+                                TAG, "Setting notification failed for " +
+                                characteristic.uuid.getDescriptorName()
                         )
                         signalEndOfOperation()
                         return@findCharacteristic
@@ -497,9 +498,9 @@ class BleConnection internal constructor(
                     bleGatt.writeDescriptor(descriptor)
                 } ?: run {
                     bleLogger.log(
-                        TAG, "Cannot find " +
-                                "${characteristicUuid.getCharacteristicName()}. Failed to enable" +
-                                " notifications."
+                            TAG, "Cannot find " +
+                            "${characteristicUuid.getCharacteristicName()}. Failed to enable" +
+                            " notifications."
                     )
                     signalEndOfOperation()
                 }
@@ -508,25 +509,26 @@ class BleConnection internal constructor(
     }
 
     private fun handleDisableNotifications(
-        operation: DisableNotifications,
-        bleGatt: BleGatt
+            operation: DisableNotifications,
+            bleGatt: BleGatt
     ) {
         with(operation) {
             findCharacteristic(bleGatt, characteristicUuid) { characteristic ->
                 if (!characteristic.isIndicatable() && !characteristic.isNotifiable()) {
                     bleLogger.log(
-                        TAG, characteristic.uuid.getCharacteristicName() +
-                                " doesn't support notifications / indications"
+                            TAG, characteristic.uuid.getCharacteristicName() +
+                            " doesn't support notifications / indications"
                     )
                     signalEndOfOperation()
                     return@findCharacteristic
                 }
-                val uuid = BleGattDescriptorUuids.CLIENT_CHARACTERISTIC_CONFIGURATION.toBluetoothUuid()
+                val uuid =
+                        BleGattDescriptorUuids.CLIENT_CHARACTERISTIC_CONFIGURATION.toBluetoothUuid()
                 characteristic.getDescriptor(uuid)?.let { cccDescriptor ->
                     if (!bleGatt.setCharacteristicNotification(characteristic, false)) {
                         bleLogger.log(
-                            TAG, "Setting notification failed for " +
-                                    characteristic.uuid.getDescriptorName()
+                                TAG, "Setting notification failed for " +
+                                characteristic.uuid.getDescriptorName()
                         )
                         signalEndOfOperation()
                         return@findCharacteristic
@@ -536,9 +538,9 @@ class BleConnection internal constructor(
                     bleGatt.writeDescriptor(cccDescriptor)
                 } ?: run {
                     bleLogger.log(
-                        TAG, "Cannot find " +
-                                "${characteristicUuid.getCharacteristicName()}. Failed to enable" +
-                                " notifications."
+                            TAG, "Cannot find " +
+                            "${characteristicUuid.getCharacteristicName()}. Failed to enable" +
+                            " notifications."
                     )
                     signalEndOfOperation()
                 }
@@ -547,8 +549,8 @@ class BleConnection internal constructor(
     }
 
     private fun handleMtuRequest(
-        operation: MtuRequest,
-        bleGatt: BleGatt
+            operation: MtuRequest,
+            bleGatt: BleGatt
     ) {
         with(operation) {
             bleGatt.requestMtu(mtu)
@@ -558,9 +560,9 @@ class BleConnection internal constructor(
     private val callback = object : BleGattCallback() {
 
         override fun onConnectionStateChange(
-            bleGatt: BleGatt,
-            status: Int,
-            newState: Int
+                bleGatt: BleGatt,
+                status: Int,
+                newState: Int
         ) {
             val deviceAddress = bleGatt.device.address
             when (status) {
@@ -589,14 +591,14 @@ class BleConnection internal constructor(
         }
 
         override fun onServicesDiscovered(
-            bleGatt: BleGatt,
-            status: Int
+                bleGatt: BleGatt,
+                status: Int
         ) {
             with(bleGatt) {
                 if (status == BleGatt.GATT_SUCCESS) {
                     bleLogger.log(
-                        TAG, "Discovered ${services.size} services for " +
-                                "device ${device.address}."
+                            TAG, "Discovered ${services.size} services for " +
+                            "device ${device.address}."
                     )
                     printGattInformation(bleLogger, TAG)
                     requestMtu(BLE_GATT_MAX_MTU_SIZE)
@@ -613,12 +615,12 @@ class BleConnection internal constructor(
         }
 
         override fun onMtuChanged(
-            bleGatt: BleGatt,
-            mtu: Int,
-            status: Int
+                bleGatt: BleGatt,
+                mtu: Int,
+                status: Int
         ) {
             bleLogger.log(
-                TAG, "Mtu changed to $mtu, success: ${status == BleGatt.GATT_SUCCESS}"
+                    TAG, "Mtu changed to $mtu, success: ${status == BleGatt.GATT_SUCCESS}"
             )
             _status.value = _status.value.copy(mtuRequestValue = mtu)
             if (pendingOperation is MtuRequest) {
@@ -627,29 +629,29 @@ class BleConnection internal constructor(
         }
 
         override fun onCharacteristicRead(
-            bleGatt: BleGatt,
-            characteristic: BleGattCharacteristic,
-            status: Int
+                bleGatt: BleGatt,
+                characteristic: BleGattCharacteristic,
+                status: Int
         ) {
             with(characteristic) {
                 when (status) {
                     BleGatt.GATT_SUCCESS -> {
                         bleLogger.log(
-                            TAG, "Read characteristic " +
-                                    "${uuid.getCharacteristicName()}|value: ${value.toHexString()}"
+                                TAG, "Read characteristic " +
+                                "${uuid.getCharacteristicName()}|value: ${value.toHexString()}"
                         )
                         _status.value = _status.value.copy(bleGattCharacteristic = this)
                     }
                     BleGatt.GATT_READ_NOT_PERMITTED -> {
                         bleLogger.log(
-                            TAG, "Read not permitted for ${uuid.getCharacteristicName()}."
+                                TAG, "Read not permitted for ${uuid.getCharacteristicName()}."
                         )
                     }
                     else -> {
                         bleLogger.log(
-                            TAG, "Characteristic read failed for " +
-                                    "${uuid.getCharacteristicName()}," +
-                                    "error: ${status.getBleGattStatus()}"
+                                TAG, "Characteristic read failed for " +
+                                "${uuid.getCharacteristicName()}," +
+                                "error: ${status.getBleGattStatus()}"
                         )
                     }
                 }
@@ -661,29 +663,29 @@ class BleConnection internal constructor(
         }
 
         override fun onCharacteristicWrite(
-            bleGatt: BleGatt,
-            characteristic: BleGattCharacteristic,
-            status: Int
+                bleGatt: BleGatt,
+                characteristic: BleGattCharacteristic,
+                status: Int
         ) {
             with(characteristic) {
                 when (status) {
                     BleGatt.GATT_SUCCESS -> {
                         bleLogger.log(
-                            TAG, "Wrote to characteristic ${uuid.getCharacteristicName()}" +
-                                    " | value: ${value.toHexString()}"
+                                TAG, "Wrote to characteristic ${uuid.getCharacteristicName()}" +
+                                " | value: ${value.toHexString()}"
                         )
                         _status.value = _status.value.copy(bleGattCharacteristic = this)
                     }
                     BleGatt.GATT_WRITE_NOT_PERMITTED -> {
                         bleLogger.log(
-                            TAG, "Write not permitted for ${uuid.getCharacteristicName()}."
+                                TAG, "Write not permitted for ${uuid.getCharacteristicName()}."
                         )
                     }
                     else -> {
                         bleLogger.log(
-                            TAG, "Characteristic write failed for " +
-                                    "${uuid.getCharacteristicName()}," +
-                                    "error: ${status.getBleGattStatus()}"
+                                TAG, "Characteristic write failed for " +
+                                "${uuid.getCharacteristicName()}," +
+                                "error: ${status.getBleGattStatus()}"
                         )
                     }
                 }
@@ -695,43 +697,43 @@ class BleConnection internal constructor(
         }
 
         override fun onCharacteristicChanged(
-            bleGatt: BleGatt,
-            characteristic: BleGattCharacteristic
+                bleGatt: BleGatt,
+                characteristic: BleGattCharacteristic
         ) {
             with(characteristic) {
                 bleLogger.log(
-                    TAG, "Characteristic ${uuid.getCharacteristicName()} " +
-                            "changed | value: ${value.toHexString()}"
+                        TAG, "Characteristic ${uuid.getCharacteristicName()} " +
+                        "changed | value: ${value.toHexString()}"
                 )
                 _status.value = _status.value.copy(bleGattCharacteristic = this)
             }
         }
 
         override fun onDescriptorRead(
-            bleGatt: BleGatt,
-            descriptor: BleGattDescriptor,
-            status: Int
+                bleGatt: BleGatt,
+                descriptor: BleGattDescriptor,
+                status: Int
         ) {
             with(descriptor) {
                 when (status) {
                     BleGatt.GATT_SUCCESS -> {
                         bleLogger.log(
-                            TAG, "Read descriptor " +
-                                    "${uuid.getDescriptorName()} | value: ${value.toHexString()}"
+                                TAG, "Read descriptor " +
+                                "${uuid.getDescriptorName()} | value: ${value.toHexString()}"
                         )
                         _status.value = _status.value.copy(bleGattDescriptor = this)
                     }
                     BleGatt.GATT_READ_NOT_PERMITTED -> {
                         bleLogger.log(
-                            TAG, "Read not permitted " +
-                                    "for ${uuid.getDescriptorName()}."
+                                TAG, "Read not permitted " +
+                                "for ${uuid.getDescriptorName()}."
                         )
                     }
                     else -> {
                         bleLogger.log(
-                            TAG, "Descriptor read failed for " +
-                                    "${uuid.getDescriptorName()}," +
-                                    "error: ${status.getBleGattStatus()}"
+                                TAG, "Descriptor read failed for " +
+                                "${uuid.getDescriptorName()}," +
+                                "error: ${status.getBleGattStatus()}"
                         )
                     }
                 }
@@ -743,20 +745,20 @@ class BleConnection internal constructor(
         }
 
         override fun onDescriptorWrite(
-            bleGatt: BleGatt,
-            descriptor: BleGattDescriptor,
-            status: Int
+                bleGatt: BleGatt,
+                descriptor: BleGattDescriptor,
+                status: Int
         ) {
             with(descriptor) {
                 when (status) {
                     BleGatt.GATT_SUCCESS -> {
                         bleLogger.log(
-                            TAG, "Wrote to descriptor " +
-                                    "${uuid.getDescriptorName()} | value: ${value.toHexString()}"
+                                TAG, "Wrote to descriptor " +
+                                "${uuid.getDescriptorName()} | value: ${value.toHexString()}"
                         )
                         if (isClientCharacteristicConfigurationDescriptor()) {
                             onClientCharacteristicConfigurationDescriptorWrite(
-                                value, characteristic
+                                    value, characteristic
                             )
                         } else {
                             _status.value = _status.value.copy(bleGattDescriptor = this)
@@ -764,62 +766,62 @@ class BleConnection internal constructor(
                     }
                     BleGatt.GATT_WRITE_NOT_PERMITTED -> {
                         bleLogger.log(
-                            TAG, "Write not permitted " +
-                                    "for ${uuid.getDescriptorName()}."
+                                TAG, "Write not permitted " +
+                                "for ${uuid.getDescriptorName()}."
                         )
                     }
                     else -> {
                         bleLogger.log(
-                            TAG, "Characteristic write failed for " +
-                                    "${uuid.getDescriptorName()}, error: ${status.getBleGattStatus()}"
+                                TAG, "Characteristic write failed for " +
+                                "${uuid.getDescriptorName()}, error: ${status.getBleGattStatus()}"
                         )
                     }
                 }
             }
 
             if (descriptor.isClientCharacteristicConfigurationDescriptor() &&
-                (pendingOperation is EnableNotifications
-                        || pendingOperation is DisableNotifications)
+                    (pendingOperation is EnableNotifications
+                            || pendingOperation is DisableNotifications)
             ) {
                 signalEndOfOperation()
             } else if (!descriptor.isClientCharacteristicConfigurationDescriptor()
-                && pendingOperation is DescriptorWrite
+                    && pendingOperation is DescriptorWrite
             ) {
                 signalEndOfOperation()
             }
         }
 
         private fun onClientCharacteristicConfigurationDescriptorWrite(
-            value: ByteArray,
-            characteristic: BleGattCharacteristic
+                value: ByteArray,
+                characteristic: BleGattCharacteristic
         ) {
             val characteristicUuid = characteristic.uuid
             val notificationsEnabled =
-                value.contentEquals(BleGattDescriptor.ENABLE_NOTIFICATION_VALUE) ||
-                        value.contentEquals(BleGattDescriptor.ENABLE_INDICATION_VALUE)
+                    value.contentEquals(BleGattDescriptor.ENABLE_NOTIFICATION_VALUE) ||
+                            value.contentEquals(BleGattDescriptor.ENABLE_INDICATION_VALUE)
             val notificationsDisabled =
-                value.contentEquals(BleGattDescriptor.DISABLE_NOTIFICATION_VALUE)
+                    value.contentEquals(BleGattDescriptor.DISABLE_NOTIFICATION_VALUE)
 
             when {
                 notificationsEnabled -> {
                     bleLogger.log(
-                        TAG, "Notifications or indications enabled on " +
-                                characteristicUuid.getCharacteristicName()
+                            TAG, "Notifications or indications enabled on " +
+                            characteristicUuid.getCharacteristicName()
                     )
                     _status.value = _status.value.copy(bleGattCharacteristic = characteristic)
                 }
                 notificationsDisabled -> {
                     bleLogger.log(
-                        TAG, "Notifications or indications disabled on " +
-                                characteristicUuid.getCharacteristicName()
+                            TAG, "Notifications or indications disabled on " +
+                            characteristicUuid.getCharacteristicName()
                     )
                     _status.value = _status.value.copy(bleGattCharacteristic = characteristic)
                 }
                 else -> {
                     bleLogger.log(
-                        TAG, "Unexpected value ${value.toHexString()} on " +
-                                "Client Characteristic Configuration Descriptor of " +
-                                characteristicUuid.getCharacteristicName()
+                            TAG, "Unexpected value ${value.toHexString()} on " +
+                            "Client Characteristic Configuration Descriptor of " +
+                            characteristicUuid.getCharacteristicName()
                     )
                 }
             }

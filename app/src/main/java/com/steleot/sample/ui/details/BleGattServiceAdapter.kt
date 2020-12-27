@@ -9,17 +9,19 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.steleot.blekotlin.BleGattService
 import com.steleot.blekotlin.utils.getCharacteristicName
+import com.steleot.blekotlin.utils.getDescriptorName
 import com.steleot.blekotlin.utils.getServiceName
 import com.steleot.blekotlin.utils.isIndicatable
 import com.steleot.blekotlin.utils.isNotifiable
 import com.steleot.blekotlin.utils.isReadable
 import com.steleot.blekotlin.utils.isWritable
 import com.steleot.sample.databinding.ItemBleCharacteristicBinding
+import com.steleot.sample.databinding.ItemBleDescriptorBinding
 import com.steleot.sample.databinding.ItemBleGattServiceBinding
 
-class BleGattServicesAdapter(
+class BleGattServiceAdapter(
     private val viewModel: DetailsViewModel
-) : ListAdapter<BleGattService, BleGattServicesAdapter.ItemViewHolder>(DiffCallback) {
+) : ListAdapter<BleGattService, BleGattServiceAdapter.ItemViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -51,7 +53,7 @@ class BleGattServicesAdapter(
             binding.service.text = service.uuid.getServiceName()
             binding.inflateLayout.removeAllViews()
             val inflater = LayoutInflater.from(itemView.context)
-            service.characteristics.forEach { characteristic ->
+            service.characteristics.forEachIndexed { index, characteristic ->
                 val charBinding = ItemBleCharacteristicBinding
                     .inflate(inflater, binding.inflateLayout, true)
                 charBinding.characteristic.text = characteristic.uuid.getCharacteristicName()
@@ -70,6 +72,14 @@ class BleGattServicesAdapter(
                 }
                 charBinding.notifiable.setOnClickListener {
                     viewModel.handleNotifiableAction(characteristic)
+                }
+                charBinding.separator.root.visibility =
+                    if (index == service.characteristics.size - 1) View.INVISIBLE else View.VISIBLE
+                charBinding.inflateLayout.removeAllViews()
+                characteristic.descriptors.forEach { descriptor ->
+                    val descBinding = ItemBleDescriptorBinding
+                        .inflate(inflater, charBinding.inflateLayout, true)
+                    descBinding.descriptor.text = descriptor.uuid.getDescriptorName()
                 }
             }
         }

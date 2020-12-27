@@ -17,7 +17,9 @@
         android:theme="@style/Theme.BleKotlin"
         tools:ignore="AllowBackup">
 
-        <activity android:name=".ui.main.MainActivity">
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -25,6 +27,7 @@
         </activity>
         <activity
             android:name=".ui.details.DetailsActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.BleKotlin.Details">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

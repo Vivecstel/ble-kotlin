@@ -269,7 +269,8 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
             _status.value = BleStatus.BluetoothWasEnabled
             if (bleDevice != null
                 && bleConnection.shouldReconnect(bleDevice!!)
-                && weakContext?.get() != null) {
+                && weakContext?.get() != null
+            ) {
                 bleLogger.log(TAG, "Trying to reconnect to ble device.")
                 bleConnection.reconnect(bleDevice!!, weakContext!!.get()!!)
             } else if (isScanning) {

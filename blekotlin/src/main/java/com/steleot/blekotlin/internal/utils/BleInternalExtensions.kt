@@ -10,12 +10,18 @@ import com.steleot.blekotlin.helper.BleLogger
 import com.steleot.blekotlin.internal.UNKNOWN_ERROR
 import com.steleot.blekotlin.internal.UNKNOWN_STATE
 import com.steleot.blekotlin.internal.UNKNOWN_STATUS
-import com.steleot.blekotlin.internal.UUID_16_BIT_LENGTH
 import com.steleot.blekotlin.internal.UUID_END_INDEX
 import com.steleot.blekotlin.internal.UUID_START_INDEX
-import com.steleot.blekotlin.internal.utils.isReadable
-import com.steleot.blekotlin.internal.utils.isWritable
-import com.steleot.blekotlin.utils.*
+import com.steleot.blekotlin.utils.getCharacteristicName
+import com.steleot.blekotlin.utils.getDescriptorName
+import com.steleot.blekotlin.utils.getServiceName
+import com.steleot.blekotlin.utils.isBroadcastable
+import com.steleot.blekotlin.utils.isIndicatable
+import com.steleot.blekotlin.utils.isNotifiable
+import com.steleot.blekotlin.utils.isReadable
+import com.steleot.blekotlin.utils.isWritable
+import com.steleot.blekotlin.utils.isWritableWithoutResponse
+import com.steleot.blekotlin.utils.toBluetoothUuidString
 import java.util.Locale
 import java.util.UUID
 

@@ -164,7 +164,8 @@ internal val gattCharacteristicUuids by lazy {
         BleGattCharacteristicUuids.APPEARANCE to "Appearance",
         BleGattCharacteristicUuids.PERIPHERAL_PRIVACY_FLAG to "Peripheral Privacy Flag",
         BleGattCharacteristicUuids.RECONNECTION_ADDRESS to "Reconnection Address",
-        BleGattCharacteristicUuids.PERIPHERAL_PREFERRED_CONNECTION_PARAMETERS to "Peripheral Preferred Connection Parameters",
+        BleGattCharacteristicUuids.PERIPHERAL_PREFERRED_CONNECTION_PARAMETERS
+                to "Peripheral Preferred Connection Parameters",
         BleGattCharacteristicUuids.SERVICE_CHANGED to "Service Changed",
         BleGattCharacteristicUuids.ALERT_LEVEL to "Alert Level",
         BleGattCharacteristicUuids.TX_POWER_LEVEL to "Tx Power Level",
@@ -195,7 +196,8 @@ internal val gattCharacteristicUuids by lazy {
         BleGattCharacteristicUuids.HARDWARE_REVISION_STRING to "Hardware Revision String",
         BleGattCharacteristicUuids.SOFTWARE_REVISION_STRING to "Software Revision String",
         BleGattCharacteristicUuids.MANUFACTURER_NAME_STRING to "Manufacturer Name String",
-        BleGattCharacteristicUuids.IEEE_11073_20601_REGULATORY_CERTIFICATION_DATA_LIST to "Iee 11073 20601 Regulatory Certification Data List",
+        BleGattCharacteristicUuids.IEEE_11073_20601_REGULATORY_CERTIFICATION_DATA_LIST
+                to "Iee 11073 20601 Regulatory Certification Data List",
         BleGattCharacteristicUuids.CURRENT_TIME to "Current Time",
         BleGattCharacteristicUuids.SCAN_REFRESH to "Scan Refresh",
         BleGattCharacteristicUuids.BOOT_KEYBOARD_OUTPUT_REPORT to "Boot Keyboard Ouput Report",
@@ -281,9 +283,11 @@ internal val gattCharacteristicUuids by lazy {
         BleGattCharacteristicUuids.HEIGHT to "Height",
         BleGattCharacteristicUuids.HIP_CIRCUMFERENCE to "Hip Circumference",
         BleGattCharacteristicUuids.LAST_NAME to "Last Name",
-        BleGattCharacteristicUuids.MAXIMUM_RECOMMENDED_HEART_RATE to "Maximum Recommended Heart Rate",
+        BleGattCharacteristicUuids.MAXIMUM_RECOMMENDED_HEART_RATE
+                to "Maximum Recommended Heart Rate",
         BleGattCharacteristicUuids.RESTING_HEART_RATE to "Resting Heart Rate",
-        BleGattCharacteristicUuids.SPORT_TYPE_FOR_AEROBIC_AND_ANAEROBIC_THRESHOLDS to "Short Type For Aerobic And Anaerobic Thresholds",
+        BleGattCharacteristicUuids.SPORT_TYPE_FOR_AEROBIC_AND_ANAEROBIC_THRESHOLDS
+                to "Short Type For Aerobic And Anaerobic Thresholds",
         BleGattCharacteristicUuids.THREE_ZONE_HEART_RATE_LIMITS to "Three Zone Heart Rate Limits",
         BleGattCharacteristicUuids.TWO_ZONE_HEART_RATE_LIMIT to "Two Zone Heart Rate Limit",
         BleGattCharacteristicUuids.VO2_MAX to "VO2 Max",
@@ -399,7 +403,8 @@ internal val gattCharacteristicUuids by lazy {
         BleGattCharacteristicUuids.POWER to "Power",
         BleGattCharacteristicUuids.POWER_SPECIFICATION to "Power Specification",
         BleGattCharacteristicUuids.RELATIVE_RUNTIME_IN_A_CURRENT_RANGE to "Relative Runtime In A Current Range",
-        BleGattCharacteristicUuids.RELATIVE_RUNTIME_IN_A_GENERIC_LEVEL_RANGE to "Relative Runtime In A Generic Level Range",
+        BleGattCharacteristicUuids.RELATIVE_RUNTIME_IN_A_GENERIC_LEVEL_RANGE
+                to "Relative Runtime In A Generic Level Range",
         BleGattCharacteristicUuids.RELATIVE_VALUE_IN_A_VOLTAGE_RANGE to "Relative Value In A Voltage Range",
         BleGattCharacteristicUuids.RELATIVE_VALUE_IN_AN_ILLUMINANCE_RANGE to "Relative Value In An Illuminance Range",
         BleGattCharacteristicUuids.RELATIVE_VALUE_IN_A_PERIOD_OF_DAY to "Relative Value In A Period Of Day",
@@ -422,7 +427,8 @@ internal val gattCharacteristicUuids by lazy {
         BleGattCharacteristicUuids.CHROMATICITY_COORDINATE to "Chromaticity Coordinate",
         BleGattCharacteristicUuids.RC_FEATURE to "Rc Feature",
         BleGattCharacteristicUuids.RC_SETTINGS to "Rc Settings",
-        BleGattCharacteristicUuids.RECONNECTION_CONFIGURATION_CONTROL_POINT to "Reconnection Configuration Control Point",
+        BleGattCharacteristicUuids.RECONNECTION_CONFIGURATION_CONTROL_POINT
+                to "Reconnection Configuration Control Point",
         BleGattCharacteristicUuids.IDD_STATUS_CHANGED to "Idd Status Changed",
         BleGattCharacteristicUuids.IDD_STATUS to "Idd Status",
         BleGattCharacteristicUuids.IDD_ANNUNCIATION_STATUS to "Idd Annunciation Status",
@@ -445,13 +451,19 @@ internal val gattCharacteristicUuids by lazy {
         BleGattCharacteristicUuids.BLUETOOTH_SIG_DATA to "Bluetooth Sig Data",
         BleGattCharacteristicUuids.SERVER_SUPPORTED_FEATURES to "Server Supported Features",
         BleGattCharacteristicUuids.PHYSICAL_ACTIVITY_MONITOR_FEATURES to "Physical",
-        BleGattCharacteristicUuids.GENERAL_ACTIVITY_INSTANTANEOUS_DATA to "General Activity Instantaneous Data",
+        BleGattCharacteristicUuids.GENERAL_ACTIVITY_INSTANTANEOUS_DATA
+                to "General Activity Instantaneous Data",
         BleGattCharacteristicUuids.GENERAL_ACTIVITY_SUMMARY_DATA to "General Activity Summary Data",
-        BleGattCharacteristicUuids.CARDIORESPIRATORY_ACTIVITY_INSTANTANEOUS_DATA to "Cardiorespiratory Activity Instantaneous Data",
-        BleGattCharacteristicUuids.CARDIORESPIRATORY_ACTIVITY_SUMMARY_DATA to "Cardiorespiratory Activity Summary Data",
-        BleGattCharacteristicUuids.STEP_COUNTER_ACTIVITY_SUMMARY_DATA to "Step Counter Activity Summary Data",
-        BleGattCharacteristicUuids.SLEEP_ACTIVITY_INSTANTANEOUS_DATA to "Sleep Activity Instantaneous Data",
-        BleGattCharacteristicUuids.SLEEP_ACTIVITY_SUMMARY_DATA to "Sleep Activity Summary Data",
+        BleGattCharacteristicUuids.CARDIORESPIRATORY_ACTIVITY_INSTANTANEOUS_DATA
+                to "Cardiorespiratory Activity Instantaneous Data",
+        BleGattCharacteristicUuids.CARDIORESPIRATORY_ACTIVITY_SUMMARY_DATA
+                to "Cardiorespiratory Activity Summary Data",
+        BleGattCharacteristicUuids.STEP_COUNTER_ACTIVITY_SUMMARY_DATA
+                to "Step Counter Activity Summary Data",
+        BleGattCharacteristicUuids.SLEEP_ACTIVITY_INSTANTANEOUS_DATA
+                to "Sleep Activity Instantaneous Data",
+        BleGattCharacteristicUuids.SLEEP_ACTIVITY_SUMMARY_DATA
+                to "Sleep Activity Summary Data",
         BleGattCharacteristicUuids.PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT to "2B43",
         BleGattCharacteristicUuids.CURRENT_SESSION to "Current Session",
         BleGattCharacteristicUuids.SESSION to "Session",
@@ -462,7 +474,8 @@ internal val gattCharacteristicUuids by lazy {
         BleGattCharacteristicUuids.HANDEDNESS to "Handedness",
         BleGattCharacteristicUuids.DEVICE_WEARING_POSITION to "Device Wearing Position",
         BleGattCharacteristicUuids.FOUR_ZONE_HEART_RATE_LIMITS to "Four Zone Heart Rate Limits",
-        BleGattCharacteristicUuids.HIGH_INTENSITY_EXERCISE_THRESHOLD to "High Intensity Exercise Threshold",
+        BleGattCharacteristicUuids.HIGH_INTENSITY_EXERCISE_THRESHOLD
+                to "High Intensity Exercise Threshold",
         BleGattCharacteristicUuids.ACTIVITY_GOAL to "Activity Goal",
         BleGattCharacteristicUuids.SEDENTARY_INTERVAL_NOTIFICATION to "Sedentary Interval Notification",
         BleGattCharacteristicUuids.CALORIC_INTAKE to "Caloric Intake",

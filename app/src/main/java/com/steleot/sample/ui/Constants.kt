@@ -1,4 +1,4 @@
 package com.steleot.sample.ui
 
-const val BLE_DEVICE = "ble_device"
+const val SCAN_RESULT = "scan-result"
 const val IS_SAVED = "is_saved"

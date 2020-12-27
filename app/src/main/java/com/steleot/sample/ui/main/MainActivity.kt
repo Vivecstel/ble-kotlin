@@ -11,8 +11,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.steleot.sample.databinding.ActivityMainBinding
-import com.steleot.sample.ui.BLE_DEVICE
 import com.steleot.sample.ui.IS_SAVED
+import com.steleot.sample.ui.SCAN_RESULT
 import com.steleot.sample.ui.details.DetailsActivity
 import timber.log.Timber
 
@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
                 viewModel.stopScanning()
                 detailsResultLauncher.launch(
                     Intent(this, DetailsActivity::class.java).apply {
-                        putExtra(BLE_DEVICE, item.first.device)
+                        putExtra(SCAN_RESULT, item.first)
                         putExtra(IS_SAVED, item.second)
                     })
             }
