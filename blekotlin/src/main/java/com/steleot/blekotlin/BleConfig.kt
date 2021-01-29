@@ -13,7 +13,9 @@ import com.steleot.blekotlin.receiver.BleReceiver
  * @param context: [Context] the context. Application context should be provided.
  * @param bleLogger: [BleLogger] for logging purposes. You can provide yours.
  * @param bleReceiver: [BleReceiver] for listening to bluetooth broadcasts. You can provide yours.
- * @param bleDeviceStoreHelper" [BleDeviceStoreHelper] for storing the ble device. You can provide yours.
+ * @param bleDeviceStoreHelper: [BleDeviceStoreHelper] for storing the ble device. You can provide yours.
+ * @param shouldTryToReconnect [Boolean] for trying to reconnect automatically from a previous
+ * successful connection when bluetooth turns off.
  */
 class BleConfig(
     val context: Context,
@@ -22,5 +24,6 @@ class BleConfig(
     val bleDeviceStoreHelper: BleDeviceStoreHelper = BleDefaultDeviceStoreHelper(
         context.applicationContext,
         bleLogger
-    )
+    ),
+    val shouldTryToReconnect: Boolean = true
 )

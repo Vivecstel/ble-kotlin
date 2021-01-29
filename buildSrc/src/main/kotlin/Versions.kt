@@ -1,11 +1,11 @@
 object Versions {
 
     /* kotlin */
-    const val kotlin = "1.4.21"
+    const val kotlin = "1.4.21-2"
     const val coroutines = "1.4.2"
 
     /* plugins */
-    const val androidPlugin = "4.1.1"
+    const val androidPlugin = "4.1.2"
     const val benManes = "0.36.0"
     const val detekt = "1.15.0"
     const val jetbrainsDokka = "1.4.20"

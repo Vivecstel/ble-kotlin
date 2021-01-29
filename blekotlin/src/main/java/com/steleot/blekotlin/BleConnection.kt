@@ -9,14 +9,7 @@ import com.steleot.blekotlin.helper.BleLogger
 import com.steleot.blekotlin.internal.*
 import com.steleot.blekotlin.internal.utils.*
 import com.steleot.blekotlin.status.BleConnectionStatus
-import com.steleot.blekotlin.utils.getCharacteristicName
-import com.steleot.blekotlin.utils.getDescriptorName
-import com.steleot.blekotlin.utils.isIndicatable
-import com.steleot.blekotlin.utils.isNotifiable
-import com.steleot.blekotlin.utils.isReadable
-import com.steleot.blekotlin.utils.isWritable
-import com.steleot.blekotlin.utils.isWritableWithoutResponse
-import com.steleot.blekotlin.utils.toHexString
+import com.steleot.blekotlin.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -252,12 +245,32 @@ class BleConnection internal constructor(
             device: BleDevice
     ): List<BleGattService> = deviceGattMap[device]?.services ?: emptyList()
 
+    /**
+     * Force closing any open connection and Clears the queue of operations and removes
+     * last pending one for the given [BleDevice].
+     */
+    fun forceTearDownDevice(
+            device: BleDevice
+    ) {
+        bleLogger.log(TAG, "Force closing connections and operations to $device.")
+        if (!deviceGattMap.contains(device)) {
+            bleLogger.log(TAG, "$device doesn't have any open connection.")
+            return
+        }
+        val iterator = operationsQueue.iterator()
+        while (iterator.hasNext()) {
+            if (iterator.next().bleDevice == device) {
+                iterator.remove()
+            }
+        }
+        deviceGattMap.remove(device)
+    }
 
     /**
      * Force closing all open connections and Clears the queue of all operations and removes
      * last pending one.
      */
-    internal fun forceTeardownAll() {
+    fun forceTeardownAll() {
         bleLogger.log(TAG, "Force closing all connections and operations.")
         operationsQueue.clear()
         pendingOperation = null

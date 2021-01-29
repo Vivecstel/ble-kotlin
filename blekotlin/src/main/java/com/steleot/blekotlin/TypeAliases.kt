@@ -30,6 +30,11 @@ typealias BleAdapter = BluetoothAdapter
 typealias BleScanFilter = ScanFilter
 
 /**
+ * Type alias for [ScanFilter.Builder].
+ */
+typealias BleScanFilterBuilder = ScanFilter.Builder
+
+/**
  * Type alias for [ScanSettings].
  */
 typealias BleScanSettings = ScanSettings

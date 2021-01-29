@@ -15,6 +15,7 @@ import com.steleot.blekotlin.utils.toHexString
 import com.steleot.sample.ui.utils.BleCharacteristicUtils.getDeviceName
 import com.steleot.sample.ui.utils.BleCharacteristicUtils.getHeartRate
 import com.steleot.sample.ui.utils.Event
+import java.util.UUID
 import kotlin.random.Random
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -34,7 +35,7 @@ class DetailsViewModel(
     private val _text = MutableLiveData<Event<String>>()
     val text: LiveData<Event<String>> = _text
 
-    private var lastAction = Action.NONE
+    private var serviceSet = mutableSetOf<UUID>()
 
     init {
         viewModelScope.launch {
@@ -64,29 +65,23 @@ class DetailsViewModel(
                         services = emptyList(),
                     )
                 }
-                status.bleGattCharacteristic?.let {
-                    when (lastAction) {
-                        Action.READ -> {
-                            val deviceName = it.getDeviceName()
-                            val heartRate = it.getHeartRate()
-                            val value: String = when {
-                                deviceName != null -> deviceName
-                                heartRate != null -> heartRate.toString()
-                                else -> it.value.toHexString()
-                            }
-                            _text.value = Event("Read action: ${it.uuid} with: $value")
-                        }
-                        Action.WRITE -> _text.value = Event(
-                            "Write action: ${it.uuid} with: ${it.value.toHexString()}"
-                        )
-                        Action.NOTIFY -> _text.value = Event(
-                            "Notify action: ${it.uuid} with: ${it.value.toHexString()}"
-                        )
-                        else -> _text.value = Event("")
-                    }
-                }
+                status.bleGattCharacteristic?.handleAction()
             }
         }
+    }
+
+    private fun BleGattCharacteristic.handleAction() {
+        if (this.value == null) return
+        val deviceName = this.getDeviceName()
+        val heartRate = this.getHeartRate()
+        val actualValue: String = when {
+            deviceName != null -> deviceName
+            heartRate != null -> heartRate.toString()
+            else -> this.value.toHexString()
+        }
+        val text = "${this.uuid} with: $actualValue"
+        _text.value = Event(text)
+        Timber.d(text)
     }
 
     fun handleActionButton(
@@ -108,7 +103,6 @@ class DetailsViewModel(
         bleGattCharacteristic: BleGattCharacteristic
     ) {
         Timber.d("Reading the value of characteristic.")
-        lastAction = Action.READ
         connection.readCharacteristic(bleDevice, bleGattCharacteristic.uuid)
     }
 
@@ -116,7 +110,6 @@ class DetailsViewModel(
         bleGattCharacteristic: BleGattCharacteristic
     ) {
         Timber.d("Writing a random value to characteristic.")
-        lastAction = Action.WRITE
         connection.writeCharacteristic(
             bleDevice, bleGattCharacteristic.uuid, Random.nextBytes(ByteArray(2))
         )
@@ -125,9 +118,15 @@ class DetailsViewModel(
     fun handleNotifiableAction(
         bleGattCharacteristic: BleGattCharacteristic
     ) {
-        Timber.d("Creating notification for characteristic.")
-        lastAction = Action.NOTIFY
-        connection.enableNotifications(bleDevice, bleGattCharacteristic.uuid)
+        Timber.d("Enabling / Disabling notification for characteristic.")
+        val uuid = bleGattCharacteristic.uuid
+        if (serviceSet.contains(uuid)) {
+            serviceSet.remove(uuid)
+            connection.disableNotifications(bleDevice, uuid)
+        } else {
+            serviceSet.add(uuid)
+            connection.enableNotifications(bleDevice, uuid)
+        }
     }
 
     override fun onCleared() {
@@ -143,7 +142,3 @@ data class BleConnectionInfo(
     val manufacturerValue: String = "",
     val services: List<BleGattService> = emptyList(),
 )
-
-enum class Action {
-    NONE, READ, WRITE, NOTIFY
-}

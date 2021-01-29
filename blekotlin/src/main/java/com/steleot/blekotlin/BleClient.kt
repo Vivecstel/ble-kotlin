@@ -56,6 +56,7 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
     private lateinit var bleScanCallback: BleScanCallback
     private lateinit var bleConnection: BleConnection
     private var bleDevice: BleDevice? = null
+    private var shouldTryToReconnect: Boolean = true
 
     private val _status: MutableStateFlow<BleStatus> = MutableStateFlow(BleStatus.NotStarted)
 
@@ -87,6 +88,7 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
         useBleReceiver = config.bleReceiver !is EmptyBleReceiver
         bleReceiver = config.bleReceiver
         bleDeviceStoreHelper = config.bleDeviceStoreHelper
+        shouldTryToReconnect = config.shouldTryToReconnect
         bleScanCallback = BleDefaultScanCallback(bleLogger, this)
         bleConnection = BleConnection(bleLogger)
     }
@@ -198,6 +200,13 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
     }
 
     /**
+     * Returns a list of bonded [BleDevice].
+     */
+    fun getBondedBleDevices(): List<BleDevice> {
+        return bleAdapter?.bondedDevices?.toList() ?: emptyList()
+    }
+
+    /**
      * Stops the ble scan if the scan is already scanning.
      */
     fun stopBleScan() {
@@ -222,6 +231,19 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
     }
 
     /**
+     * Gets the latest [BleConnection] if any connection attempts happened before else throwing
+     * a [BleException].
+     * @return [BleConnection] that handles any Gatt operations.
+     */
+    fun getActiveBleConnection(): BleConnection {
+        validateProperInitialization()
+        if (this.bleDevice == null) {
+            throw BleException("Trying to get active ble connection with no device")
+        }
+        return bleConnection
+    }
+
+    /**
      * Connects to the given [BleDevice] through a [BleConnection].
      * @param bleDevice: [BleDevice] that should start a connection.
      * @return [BleConnection] that handles any Gatt operations.
@@ -231,6 +253,7 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
     ): BleConnection {
         validateProperInitialization()
         this.bleDevice = bleDevice
+        // if any ble connection active to that ble device try to tear it.
         bleConnection.teardownConnection(bleDevice)
         stopBleScanInternal()
         weakContext?.get()?.let { context ->
@@ -267,7 +290,8 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
         if (isEnabled) {
             bleLogger.log(TAG, "Bluetooth was enabled.")
             _status.value = BleStatus.BluetoothWasEnabled
-            if (bleDevice != null
+            if (shouldTryToReconnect
+                && bleDevice != null
                 && bleConnection.shouldReconnect(bleDevice!!)
                 && weakContext?.get() != null
             ) {
@@ -289,6 +313,7 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
     ) {
         if (isBonded) {
             bleLogger.log(TAG, "Trying to reconnect to ble device after bonding success.")
+            // this should not check config value for reconnect
             bleConnection.reconnect(bleDevice!!, weakContext!!.get()!!)
         } else {
             bleConnection.teardownConnection(bleDevice!!)
