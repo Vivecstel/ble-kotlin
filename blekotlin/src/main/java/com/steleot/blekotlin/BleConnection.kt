@@ -595,6 +595,9 @@ class BleConnection internal constructor(
                     bleGatt.device.createBond()
                 }
                 else -> {
+                    bleLogger.log(
+                        TAG, "Failed to connected with error: ${status.getBleGattStatus()}"
+                    )
                     if (pendingOperation is Connect) {
                         signalEndOfOperation()
                     }
@@ -614,7 +617,7 @@ class BleConnection internal constructor(
                             "device ${device.address}."
                     )
                     printGattInformation(bleLogger, TAG)
-                    requestMtu(BLE_GATT_MAX_MTU_SIZE)
+                    requestMtu(bleGatt.device, BLE_GATT_MAX_MTU_SIZE)
                     _status.value = _status.value.copy(isConnected = true, bleDevice = device)
                 } else {
                     bleLogger.log(TAG, "Service discovery failed due to status $status")

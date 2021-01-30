@@ -115,6 +115,13 @@ fun String.toBluetoothUuidString(): String {
 }
 
 /**
+ * Extension function that returns the given [String] to bluetooth [UUID].
+ */
+fun String.toBluetoothUuid(): UUID {
+    return UUID.fromString(this.toBluetoothUuidString())
+}
+
+/**
  * Extension function that returns the given [ByteArray] to hex [String] for logging purposes.
  */
 fun ByteArray.toHexString(): String =

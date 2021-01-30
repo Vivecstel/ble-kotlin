@@ -184,13 +184,6 @@ internal fun UUID.getStandardizedUuidAsString(): String {
 }
 
 /**
- * Extension function that returns the given [String] to bluetooth [UUID].
- */
-internal fun String.toBluetoothUuid(): UUID {
-    return UUID.fromString(this.toBluetoothUuidString())
-}
-
-/**
  * Extension function that checks if the given [BleGattDescriptor] is of
  * [BleGattDescriptorUuids.CLIENT_CHARACTERISTIC_CONFIGURATION] that is needed for enabling / disabling
  * notification for [BleGattCharacteristic].
