@@ -1,16 +1,12 @@
 package com.steleot.sample.ui.main
 
-import android.os.ParcelUuid
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.steleot.blekotlin.BleClient
-import com.steleot.blekotlin.BleScanFilterBuilder
 import com.steleot.blekotlin.BleScanResult
-import com.steleot.blekotlin.constants.BleGattServiceUuids
 import com.steleot.blekotlin.status.BleStatus
-import com.steleot.blekotlin.utils.toBluetoothUuidString
 import com.steleot.sample.ui.utils.Event
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -64,14 +60,14 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             BleClient.getStoredDevice().collect { device ->
                 BleClient.startBleScanMultiple(
-                    /* add filters if needed */
-                    listOf(
+                    /* add filters if needed. The below is an example of heart rate search*/
+                    /*listOf(
                         BleScanFilterBuilder()
                             .setServiceUuid(
                                 ParcelUuid.fromString(BleGattServiceUuids.HEART_RATE.toBluetoothUuidString())
                             )
                             .build()
-                    )
+                    )*/
                 ).collect { results ->
                     _results.value = results.map {
                         it to (it.device.address == device)

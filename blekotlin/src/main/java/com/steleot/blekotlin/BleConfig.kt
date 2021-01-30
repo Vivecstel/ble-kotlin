@@ -25,5 +25,6 @@ class BleConfig(
         context.applicationContext,
         bleLogger
     ),
-    val shouldTryToReconnect: Boolean = true
+    val shouldTryToReconnect: Boolean = true,
+    val shouldStopScanningAfterConnect: Boolean = false
 )

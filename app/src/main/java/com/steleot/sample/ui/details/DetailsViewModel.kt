@@ -39,7 +39,8 @@ class DetailsViewModel(
 
     init {
         viewModelScope.launch {
-            connection = BleClient.connectTo(bleDevice)
+            connection = BleClient.getBleConnection()
+            BleClient.connectTo(bleDevice)
             _connectionInfo.value = _connectionInfo.value?.copy(
                 title = "${bleDevice.name} - ${bleDevice.address}",
                 isSaved = isSaved

@@ -57,6 +57,7 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
     private lateinit var bleConnection: BleConnection
     private var bleDevice: BleDevice? = null
     private var shouldTryToReconnect: Boolean = true
+    private var shouldStopScanningAfterConnect: Boolean = false
 
     private val _status: MutableStateFlow<BleStatus> = MutableStateFlow(BleStatus.NotStarted)
 
@@ -89,6 +90,7 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
         bleReceiver = config.bleReceiver
         bleDeviceStoreHelper = config.bleDeviceStoreHelper
         shouldTryToReconnect = config.shouldTryToReconnect
+        shouldStopScanningAfterConnect = config.shouldStopScanningAfterConnect
         bleScanCallback = BleDefaultScanCallback(bleLogger, this)
         bleConnection = BleConnection(bleLogger)
     }
@@ -231,35 +233,29 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
     }
 
     /**
-     * Gets the latest [BleConnection] if any connection attempts happened before else throwing
-     * a [BleException].
+     * Gets the [BleConnection].
      * @return [BleConnection] that handles any Gatt operations.
      */
-    fun getActiveBleConnection(): BleConnection {
+    fun getBleConnection(): BleConnection {
         validateProperInitialization()
-        if (this.bleDevice == null) {
-            throw BleException("Trying to get active ble connection with no device")
-        }
         return bleConnection
     }
 
     /**
      * Connects to the given [BleDevice] through a [BleConnection].
      * @param bleDevice: [BleDevice] that should start a connection.
-     * @return [BleConnection] that handles any Gatt operations.
      */
     fun connectTo(
         bleDevice: BleDevice
-    ): BleConnection {
+    ) {
         validateProperInitialization()
         this.bleDevice = bleDevice
         // if any ble connection active to that ble device try to tear it.
         bleConnection.teardownConnection(bleDevice)
-        stopBleScanInternal()
+        if (shouldStopScanningAfterConnect) stopBleScanInternal()
         weakContext?.get()?.let { context ->
             bleConnection.connect(bleDevice, context)
         }
-        return bleConnection
     }
 
     /**
