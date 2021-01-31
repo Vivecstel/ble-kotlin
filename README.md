@@ -12,12 +12,12 @@ Gradle
 
 With groovy:
 ```groovy
-implementation 'com.steleot.blekotlin:blekotlin:0.4.0'
+implementation 'com.steleot.blekotlin:blekotlin:0.7.0'
 ```
 
 With kotlin dsl:
 ```kotlin
-implementation("com.steleot.blekotlin:blekotlin:0.4.0")
+implementation("com.steleot.blekotlin:blekotlin:0.7.0")
 ```
 
 Maven
@@ -26,7 +26,7 @@ Maven
 <dependency>
   <groupId>com.steleot.blekotlin</groupId>
   <artifactId>blekotlin</artifactId>
-  <version>0.4.0</version>
+  <version>0.7.0</version>
   <type>pom</type>
 </dependency>
 ```
