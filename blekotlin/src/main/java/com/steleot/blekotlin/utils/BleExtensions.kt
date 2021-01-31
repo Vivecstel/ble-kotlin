@@ -13,7 +13,7 @@ import com.steleot.blekotlin.internal.utils.getStandardizedUuidAsString
 import java.util.UUID
 
 /**
- * todo stelios
+ * Extension function that returns the [BleManufacturerData] for the [BleScanResult].
  */
 fun BleScanResult.getManufacturerData(): BleManufacturerData? {
     this.scanRecord?.let {

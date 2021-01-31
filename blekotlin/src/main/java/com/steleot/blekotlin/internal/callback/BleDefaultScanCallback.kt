@@ -26,9 +26,9 @@ internal class BleDefaultScanCallback(
     }
 
     override fun onBatchScanResults(
-        results: MutableList<BleScanResult>?
+        results: List<BleScanResult>?
     ) {
-        /* empty implementation */
+        listener.onBatchScanResult(results)
     }
 
     override fun onScanFailed(
@@ -48,9 +48,15 @@ internal class BleDefaultScanCallback(
     interface BleScanCallbackListener {
 
         /**
-         * Returns the blescan result if successfull.
+         * Returns the blescan result if successful.
          * @param bleScanResult: [BleScanResult] if successful, null otherwise.
          */
         fun onScanResult(bleScanResult: BleScanResult?)
+
+        /**
+         * Returns a list of blescan result if successful.
+         * @param bleScanResults: [List] of [BleScanResult] if successful, null otherwise.
+         */
+        fun onBatchScanResult(bleScanResults: List<BleScanResult>?)
     }
 }

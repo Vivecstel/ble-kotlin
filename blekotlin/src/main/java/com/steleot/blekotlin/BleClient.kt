@@ -103,9 +103,10 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
      */
     fun startBleScanSingle(
         filters: List<BleScanFilter>? = null,
-        settings: BleScanSettings = BleScanSettingsBuilder().build()
+        settings: BleScanSettings = BleScanSettingsBuilder().build(),
+        forceScan: Boolean = false
     ): StateFlow<BleScanResult?> {
-        startBleScanCommon(filters, settings, BleScanMode.SingleMode)
+        startBleScanCommon(filters, settings, BleScanMode.SingleMode, forceScan)
         return _bleDevice.asStateFlow()
     }
 
@@ -117,19 +118,21 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
      */
     fun startBleScanMultiple(
         filters: List<BleScanFilter>? = null,
-        settings: BleScanSettings = BleScanSettingsBuilder().build()
+        settings: BleScanSettings = BleScanSettingsBuilder().build(),
+        forceScan: Boolean = false
     ): StateFlow<List<BleScanResult>> {
-        startBleScanCommon(filters, settings, BleScanMode.ListMode)
+        startBleScanCommon(filters, settings, BleScanMode.ListMode, forceScan)
         return _bleDevices.asStateFlow()
     }
 
     private fun startBleScanCommon(
         filters: List<BleScanFilter>?,
         settings: BleScanSettings,
-        bleScanMode: BleScanMode
+        bleScanMode: BleScanMode,
+        forceScan: Boolean
     ) {
         validateProperInitialization()
-        if (isScanning) {
+        if (!forceScan && isScanning) {
             bleLogger.log(TAG, "Ble is already scanning")
         } else {
             this.bleScanMode = bleScanMode
@@ -205,7 +208,24 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
      * Returns a list of bonded [BleDevice].
      */
     fun getBondedBleDevices(): List<BleDevice> {
-        return bleAdapter?.bondedDevices?.toList() ?: emptyList()
+        validateProperInitialization()
+        return bleAdapter!!.bondedDevices?.toList() ?: emptyList()
+    }
+
+    /**
+     * Returns [Boolean] to indicate bluetooth startup has begun.
+     */
+    fun enable(): Boolean {
+        validateProperInitialization()
+        return bleAdapter!!.enable()
+    }
+
+    /**
+     * Returns [Boolean] to indicate bluetooth shutdown has begun.
+     */
+    fun disable(): Boolean {
+        validateProperInitialization()
+        return bleAdapter!!.disable()
     }
 
     /**
@@ -325,28 +345,47 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
     override fun onScanResult(
         bleScanResult: BleScanResult?
     ) {
-        if (bleScanMode == BleScanMode.SingleMode) {
-            _bleDevice.value = bleScanResult
-        } else if (bleScanMode == BleScanMode.ListMode) {
-            if (bleScanResult != null) {
-                val index = _bleDevices.value.indexOfFirst { result ->
-                    result.device.address == bleScanResult.device.address
-                }
-                val list = _bleDevices.value.toMutableList()
-                if (index != -1) {
-                    list[index] = bleScanResult
+        when (bleScanMode) {
+            BleScanMode.SingleMode -> _bleDevice.value = bleScanResult
+            BleScanMode.ListMode -> {
+                if (bleScanResult != null) {
+                    val index = _bleDevices.value.indexOfFirst { result ->
+                        result.device.address == bleScanResult.device.address
+                    }
+                    val list = _bleDevices.value.toMutableList()
+                    if (index != -1) {
+                        list[index] = bleScanResult
+                    } else {
+                        list.add(bleScanResult)
+                    }
+                    _bleDevices.value = list.toList()
                 } else {
-                    list.add(bleScanResult)
+                    _bleDevices.value = listOf()
                 }
-                _bleDevices.value = list
-                    .toList()
-            } else {
-                _bleDevices.value = listOf()
             }
-        } else {
-            bleLogger.log(TAG, "Something went wrong. Clearing all state flows.")
-            _bleDevice.value = null
-            _bleDevices.value = emptyList()
+            else -> clearScanResults()
+        }
+    }
+
+    private fun clearScanResults() {
+        bleLogger.log(TAG, "Something went wrong. Clearing all state flows.")
+        _bleDevice.value = null
+        _bleDevices.value = emptyList()
+    }
+
+    override fun onBatchScanResult(
+        bleScanResults: List<BleScanResult>?
+    ) {
+        when (bleScanMode) {
+            BleScanMode.SingleMode -> throw BleException("Cannot use SingleMode for batch scanning")
+            BleScanMode.ListMode -> {
+                if (!bleScanResults.isNullOrEmpty()) {
+                    _bleDevices.value = bleScanResults
+                } else {
+                    _bleDevices.value = listOf()
+                }
+            }
+            else -> clearScanResults()
         }
     }
 }
