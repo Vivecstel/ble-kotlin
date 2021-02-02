@@ -1,7 +1,7 @@
 object PublishLibrary {
     const val artifactName = "blekotlin"
     const val artifactGroup = "com.steleot.blekotlin"
-    const val artifactVersion = "0.7.0"
+    const val artifactVersion = "0.7.1"
     const val pomUrl = "https://github.com/Vivecstel/ble-kotlin"
     const val pomVcsUrl = "https://github.com/Vivecstel/ble-kotlin.git"
     const val pomDesc = "Small android ble library with coroutines and flows"

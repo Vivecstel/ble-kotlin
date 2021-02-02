@@ -187,7 +187,11 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
                 }
                 isScanning = true
                 bleDevice = null
-                bleAdapter!!.bluetoothLeScanner!!.startScan(filters, settings, bleScanCallback)
+                if (bleAdapter!!.bluetoothLeScanner != null) {
+                    bleAdapter!!.bluetoothLeScanner.startScan(filters, settings, bleScanCallback)
+                } else {
+                    bleLogger.log(TAG, "Unable to start scan after many tries")
+                }
             }
         }
     }
@@ -242,7 +246,11 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
 
     private fun stopBleScanInternal() {
         bleLogger.log(TAG, "Stopping Ble scanning")
-        bleAdapter!!.bluetoothLeScanner!!.stopScan(bleScanCallback)
+        if (bleAdapter!!.bluetoothLeScanner != null) {
+            bleAdapter!!.bluetoothLeScanner?.stopScan(bleScanCallback)
+        } else {
+            bleLogger.log(TAG, "Unable to stop scan after many tries")
+        }
     }
 
     private fun unregisterReceiver() {
