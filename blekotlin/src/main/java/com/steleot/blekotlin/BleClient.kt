@@ -245,6 +245,10 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
     }
 
     private fun stopBleScanInternal() {
+        if (bleAdapter == null) {
+            bleLogger.log(TAG, "BleAdapter is null. Check status first before...")
+            return
+        }
         bleLogger.log(TAG, "Stopping Ble scanning")
         if (bleAdapter!!.bluetoothLeScanner != null) {
             bleAdapter!!.bluetoothLeScanner?.stopScan(bleScanCallback)
