@@ -12,21 +12,21 @@ Gradle
 
 With groovy:
 ```groovy
-implementation 'com.steleot.blekotlin:blekotlin:0.7.0'
+implementation 'com.github.Vivecstel:ble-kotlin:0.7.2'
 ```
 
 With kotlin dsl:
 ```kotlin
-implementation("com.steleot.blekotlin:blekotlin:0.7.0")
+implementation("com.github.Vivecstel:ble-kotlin:0.7.2")
 ```
 
 Maven
 
 ```xml
 <dependency>
-  <groupId>com.steleot.blekotlin</groupId>
+  <groupId>com.github.Vivecstel:ble-kotlin</groupId>
   <artifactId>blekotlin</artifactId>
-  <version>0.7.0</version>
+  <version>0.7.2</version>
   <type>pom</type>
 </dependency>
 ```
