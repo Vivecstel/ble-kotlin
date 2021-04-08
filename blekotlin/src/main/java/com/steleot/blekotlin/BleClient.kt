@@ -179,6 +179,7 @@ object BleClient : BleReceiver.BleReceiverListener, BleDefaultScanCallback.BleSc
                 _status.value = BleStatus.LocationPermissionNotGranted
             }
             else -> {
+                _status.value = BleStatus.BluetoothWasEnabled
                 bleLogger.log(TAG, "Ble scan started.")
                 if (useBleReceiver) {
                     if (!isScanning) registerReceiver()
