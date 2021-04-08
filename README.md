@@ -12,12 +12,12 @@ Gradle
 
 With groovy:
 ```groovy
-implementation 'com.github.Vivecstel:ble-kotlin:0.7.2'
+implementation 'com.github.Vivecstel:ble-kotlin:0.8.0'
 ```
 
 With kotlin dsl:
 ```kotlin
-implementation("com.github.Vivecstel:ble-kotlin:0.7.2")
+implementation("com.github.Vivecstel:ble-kotlin:0.8.0")
 ```
 
 Maven
@@ -26,7 +26,7 @@ Maven
 <dependency>
   <groupId>com.github.Vivecstel:ble-kotlin</groupId>
   <artifactId>blekotlin</artifactId>
-  <version>0.7.2</version>
+  <version>0.8.0</version>
   <type>pom</type>
 </dependency>
 ```
